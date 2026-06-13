@@ -9,7 +9,7 @@
 
 #include <esp_log.h>
 #include <driver/i2c_master.h>
-#include <esp_lcd_panel_vendor.h>
+#include <esp_lcd_panel_vendor.h> 
 #include <esp_lcd_panel_io.h>
 #include <esp_lcd_panel_ops.h>
 #include <driver/spi_common.h>
