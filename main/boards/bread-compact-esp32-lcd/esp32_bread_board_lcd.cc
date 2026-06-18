@@ -100,24 +100,21 @@ private:
 #if defined(LCD_TYPE_ILI9341_SERIAL)
         ESP_ERROR_CHECK(esp_lcd_new_panel_ili9341(panel_io, &panel_config, &panel));
 #elif defined(LCD_TYPE_GC9A01_SERIAL)
-        ESP_ERROR_CHECK(esp_lcd_new_panel_gc9a01(panel_io, &panel_config, &panel));
         gc9a01_vendor_config_t gc9107_vendor_config = {
             .init_cmds = gc9107_lcd_init_cmds,
             .init_cmds_size = sizeof(gc9107_lcd_init_cmds) / sizeof(gc9a01_lcd_init_cmd_t),
-        };        
+        };
+        panel_config.vendor_config = &gc9107_vendor_config;
+        ESP_ERROR_CHECK(esp_lcd_new_panel_gc9a01(panel_io, &panel_config, &panel));
 #else
         ESP_ERROR_CHECK(esp_lcd_new_panel_st7789(panel_io, &panel_config, &panel));
 #endif
-        
-        esp_lcd_panel_reset(panel);
 
+        esp_lcd_panel_reset(panel);
         esp_lcd_panel_init(panel);
         esp_lcd_panel_invert_color(panel, DISPLAY_INVERT_COLOR);
         esp_lcd_panel_swap_xy(panel, DISPLAY_SWAP_XY);
         esp_lcd_panel_mirror(panel, DISPLAY_MIRROR_X, DISPLAY_MIRROR_Y);
-#ifdef  LCD_TYPE_GC9A01_SERIAL
-        panel_config.vendor_config = &gc9107_vendor_config;
-#endif
         display_ = new SpiLcdDisplay(panel_io, panel,
                                     DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_OFFSET_X, DISPLAY_OFFSET_Y, DISPLAY_MIRROR_X, DISPLAY_MIRROR_Y, DISPLAY_SWAP_XY);
     }
