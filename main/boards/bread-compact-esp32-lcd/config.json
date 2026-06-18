@@ -4,7 +4,7 @@
         {
             "name": "bread-compact-esp32-lcd",
             "sdkconfig_append": [
-                "CONFIG_LCD_ST7735_128X160=y",
+                "CONFIG_LCD_GC9A01_240X240=y",
                 "CONFIG_SR_WN_WN9_ALEXA=y"
             ]
         }
