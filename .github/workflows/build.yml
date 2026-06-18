@@ -41,7 +41,7 @@ jobs:
 
           # push 到 main 分支，编译全部变体
           if [[ "$EVENT_NAME" == "push" ]]; then
-             FILTERED=$(echo "$ALL_VARIANTS" | jq -c 'map(select(.board == "bread-compact-esp32-lcd"))')
+             FILTERED=$(echo "$ALL_VARIANTS" | jq -c 'map(select(.board == "bread-compact-wifi-lcd"))')
              echo "variants=$FILTERED" >> $GITHUB_OUTPUT
              exit 0
           fi          # pull_request 场景
