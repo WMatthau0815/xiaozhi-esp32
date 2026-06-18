@@ -134,10 +134,11 @@ private:
     }
 
     // 物联网初始化，添加对 AI 可见设备
-    void InitializeTools() {
-        static LampController lamp(LAMP_GPIO);
-    }
-
+void InitializeTools() {
+    #ifdef LAMP_GPIO
+    static LampController lamp(LAMP_GPIO);
+    #endif
+}
 public:
     CompactWifiBoardLCD() :
         boot_button_(BOOT_BUTTON_GPIO) {
@@ -151,10 +152,14 @@ public:
         
     }
 
-    virtual Led* GetLed() override {
+virtual Led* GetLed() override {
+    if (BUILTIN_LED_GPIO != GPIO_NUM_NC) {
         static SingleLed led(BUILTIN_LED_GPIO);
         return &led;
     }
+    static NoLed no_led;
+    return &no_led;
+}
 
     virtual AudioCodec* GetAudioCodec() override {
 #ifdef AUDIO_I2S_METHOD_SIMPLEX
