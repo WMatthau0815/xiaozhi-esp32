@@ -120,8 +120,7 @@ private:
 #endif
         display_ = new SpiLcdDisplay(panel_io, panel,
                                     DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_OFFSET_X, DISPLAY_OFFSET_Y, DISPLAY_MIRROR_X, DISPLAY_MIRROR_Y, DISPLAY_SWAP_XY);
-    // Enable power save mode for idle state
-        SetPowerSaveMode(true);
+
     }
 
     void InitializeButtons() {
