@@ -6,6 +6,7 @@
             "sdkconfig_append": [
                 "CONFIG_LCD_GC9A01_240X240=y",
                 "CONFIG_USE_MULTILINE_CHAT_MESSAGE=y",
+                "CONFIG_USE_DEFAULT_MESSAGE_STYLE=y",
                 "CONFIG_SR_WN_WN9_ALEXA=y"
             ]
         }
