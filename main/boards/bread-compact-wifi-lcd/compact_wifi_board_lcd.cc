@@ -126,23 +126,29 @@ void InitializeLcdDisplay() {
     display_ = new SpiLcdDisplay(panel_io_, panel_,
                                 DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_OFFSET_X, DISPLAY_OFFSET_Y,
                                 DISPLAY_MIRROR_X, DISPLAY_MIRROR_Y, DISPLAY_SWAP_XY);
+        // 🆕 Display beim Start immer einschalten
+    if (panel_ != nullptr) {
+        esp_lcd_panel_disp_on_off(panel_, true);
+    }
 }
 
 void SetPowerSaveMode(bool enable) {
-    if (display_ != nullptr && panel_ != nullptr) {
-        if (enable) {
-            // Bildschirm ausschalten
-            esp_lcd_panel_disp_on_off(panel_, false);
-            // Optional: Display in Schlafmodus versetzen (spart noch mehr Strom)
-            // esp_lcd_panel_disp_sleep(panel_, true);
-        } else {
-            // Aufwecken
-            esp_lcd_panel_disp_sleep(panel_, false);
-            esp_lcd_panel_disp_on_off(panel_, true);
-            // Kein Refresh nötig – das UI wird beim nächsten Event neu gezeichnet
-        }
+    // Während des Bootvorgangs (display_ ist noch nicht initialisiert) -> nichts tun
+    if (display_ == nullptr || panel_ == nullptr) {
+        return;
+    }
+
+    if (enable) {
+        // Nur wenn wirklich im Leerlauf (nach Konversation)
+        esp_lcd_panel_disp_on_off(panel_, false);
+        // Optional: esp_lcd_panel_disp_sleep(panel_, true);
+    } else {
+        // Aufwecken (auch beim Start)
+        esp_lcd_panel_disp_sleep(panel_, false);
+        esp_lcd_panel_disp_on_off(panel_, true);
     }
 }
+
 void InitializeButtons() {
         boot_button_.OnClick([this]() {
             auto& app = Application::GetInstance();
