@@ -135,8 +135,8 @@ void SetPowerSaveLevel(PowerSaveLevel level) override {
     }
     if (level == PowerSaveLevel::LOW_POWER) {
         // UI Farben setzen (optional)
-        lv_disp_set_bg_color(lv_disp_get_default(), lv_color_hex(0x000000));
-        lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0xFFFFFF), 0);
+        lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_STATE_DEFAULT);
+        lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0xFFFFFF), LV_STATE_DEFAULT);
 
         // Panel wirklich aus
         esp_lcd_panel_disp_on_off(panel_, false);
@@ -146,8 +146,8 @@ void SetPowerSaveLevel(PowerSaveLevel level) override {
     esp_lcd_panel_disp_on_off(panel_, true);
 
     // UI Farben setzen
-    lv_disp_set_bg_color(lv_disp_get_default(), lv_color_hex(0xFFFFFF));
-    lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0x000000), 0);
+    lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0xFFFFFF), LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0x000000), LV_STATE_DEFAULT);
 
     // LVGL sofort aktualisieren
     lv_refr_now(NULL);
