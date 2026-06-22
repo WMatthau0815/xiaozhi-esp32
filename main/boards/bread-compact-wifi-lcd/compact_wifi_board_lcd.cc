@@ -129,29 +129,16 @@ private:
     }
 
 void SetPowerSaveLevel(PowerSaveLevel level) override {
-    if (display_ == nullptr || panel_ == nullptr) {
-        return;
-    }
+    if (display_ == nullptr || panel_ == nullptr) return;
 
-    if (level == PowerSaveLevel::LOW_POWER) {
-        // UI auf dunkel stellen (falls es weiter rendert)
-        display_->SetTheme("dark");
-
-        // Display wirklich ausschalten (wichtig gegen Einbrennen)
-        esp_lcd_panel_disp_on_off(panel_, false);
-
-        // Optional: UI einmal auf schwarz setzen (falls dein Theme/Render das unterstützt)
-        // display_->FillScreen(0x0000);
-        // display_->Refresh();
-    } else {
-        // Display wieder einschalten
-        esp_lcd_panel_disp_on_off(panel_, true);
-
-        // UI auf hell stellen
-        display_->SetTheme("light");
-
-        // Optional: UI einmal frisch zeichnen, falls ihr in LOW_POWER nicht rendert
-        // display_->Refresh();
+    switch (level) {
+        case PowerSaveLevel::LOW_POWER:
+            esp_lcd_panel_disp_on_off(panel_, false);
+            break;
+        case PowerSaveLevel::PERFORMANCE:
+        default:
+            esp_lcd_panel_disp_on_off(panel_, true);
+            break;
     }
 }
 
