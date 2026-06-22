@@ -64,8 +64,6 @@ private:
  
     Button boot_button_;
     LcdDisplay* display_;
-    esp_lcd_panel_io_handle_t panel_io_ = nullptr;  // Neu
-    esp_lcd_panel_handle_t panel_ = nullptr;        // Neu
 
     void InitializeSpi() {
         spi_bus_config_t buscfg = {};
@@ -78,76 +76,73 @@ private:
         ESP_ERROR_CHECK(spi_bus_initialize(SPI3_HOST, &buscfg, SPI_DMA_CH_AUTO));
     }
 
-void InitializeLcdDisplay() {
-    // panel_io und panel sind jetzt Member-Variablen
-    // Kein "esp_lcd_panel_io_handle_t panel_io = nullptr;" mehr
-    // Kein "esp_lcd_panel_handle_t panel = nullptr;" mehr
+    void InitializeLcdDisplay() {
+        esp_lcd_panel_io_handle_t panel_io = nullptr;
+        esp_lcd_panel_handle_t panel = nullptr;
+        // 液晶屏控制IO初始化
+        ESP_LOGD(TAG, "Install panel IO");
+        esp_lcd_panel_io_spi_config_t io_config = {};
+        io_config.cs_gpio_num = DISPLAY_CS_PIN;
+        io_config.dc_gpio_num = DISPLAY_DC_PIN;
+        io_config.spi_mode = DISPLAY_SPI_MODE;
+        io_config.pclk_hz = 20 * 1000 * 1000;
+        io_config.trans_queue_depth = 10;
+        io_config.lcd_cmd_bits = 8;
+        io_config.lcd_param_bits = 8;
+        ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi(SPI3_HOST, &io_config, &panel_io));
 
-    ESP_LOGD(TAG, "Install panel IO");
-    esp_lcd_panel_io_spi_config_t io_config = {};
-    io_config.cs_gpio_num = DISPLAY_CS_PIN;
-    io_config.dc_gpio_num = DISPLAY_DC_PIN;
-    io_config.spi_mode = DISPLAY_SPI_MODE;
-    io_config.pclk_hz = 20 * 1000 * 1000;
-    io_config.trans_queue_depth = 10;
-    io_config.lcd_cmd_bits = 8;
-    io_config.lcd_param_bits = 8;
-    ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi(SPI3_HOST, &io_config, &panel_io_));
-
-    ESP_LOGD(TAG, "Install LCD driver");
-    esp_lcd_panel_dev_config_t panel_config = {};
-    panel_config.reset_gpio_num = DISPLAY_RST_PIN;
-    panel_config.rgb_ele_order = DISPLAY_RGB_ORDER;
-    panel_config.bits_per_pixel = 16;
+        // 初始化液晶屏驱动芯片
+        ESP_LOGD(TAG, "Install LCD driver");
+        esp_lcd_panel_dev_config_t panel_config = {};
+        panel_config.reset_gpio_num = DISPLAY_RST_PIN;
+        panel_config.rgb_ele_order = DISPLAY_RGB_ORDER;
+        panel_config.bits_per_pixel = 16;
 #if defined(LCD_TYPE_ILI9341_SERIAL)
-    ESP_ERROR_CHECK(esp_lcd_new_panel_ili9341(panel_io_, &panel_config, &panel_));
+        ESP_ERROR_CHECK(esp_lcd_new_panel_ili9341(panel_io, &panel_config, &panel));
 #elif defined(LCD_TYPE_GC9A01_SERIAL)
-    ESP_ERROR_CHECK(esp_lcd_new_panel_gc9a01(panel_io_, &panel_config, &panel_));
-    // Vendor-Konfig wird NACH dem Panel-Create zugewiesen (wie im Original)
-    gc9a01_vendor_config_t gc9107_vendor_config = {
-        .init_cmds = gc9107_lcd_init_cmds,
-        .init_cmds_size = sizeof(gc9107_lcd_init_cmds) / sizeof(gc9a01_lcd_init_cmd_t),
-    };
+        ESP_ERROR_CHECK(esp_lcd_new_panel_gc9a01(panel_io, &panel_config, &panel));
+        gc9a01_vendor_config_t gc9107_vendor_config = {
+            .init_cmds = gc9107_lcd_init_cmds,
+            .init_cmds_size = sizeof(gc9107_lcd_init_cmds) / sizeof(gc9a01_lcd_init_cmd_t),
+        };        
 #else
-    ESP_ERROR_CHECK(esp_lcd_new_panel_st7789(panel_io_, &panel_config, &panel_));
+        ESP_ERROR_CHECK(esp_lcd_new_panel_st7789(panel_io, &panel_config, &panel));
 #endif
+        
+        esp_lcd_panel_reset(panel);
 
-    esp_lcd_panel_reset(panel_);
-    esp_lcd_panel_init(panel_);
-    esp_lcd_panel_invert_color(panel_, DISPLAY_INVERT_COLOR);
-    esp_lcd_panel_swap_xy(panel_, DISPLAY_SWAP_XY);
-    esp_lcd_panel_mirror(panel_, DISPLAY_MIRROR_X, DISPLAY_MIRROR_Y);
-
-#ifdef LCD_TYPE_GC9A01_SERIAL
-    // vendor_config wird NACH dem Panel-Create zugewiesen – genau wie im Original
-    panel_config.vendor_config = &gc9107_vendor_config;
+        esp_lcd_panel_init(panel);
+        esp_lcd_panel_invert_color(panel, DISPLAY_INVERT_COLOR);
+        esp_lcd_panel_swap_xy(panel, DISPLAY_SWAP_XY);
+        esp_lcd_panel_mirror(panel, DISPLAY_MIRROR_X, DISPLAY_MIRROR_Y);
+#ifdef  LCD_TYPE_GC9A01_SERIAL
+        panel_config.vendor_config = &gc9107_vendor_config;
 #endif
+        display_ = new SpiLcdDisplay(panel_io, panel,
+                                    DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_OFFSET_X, DISPLAY_OFFSET_Y, DISPLAY_MIRROR_X, DISPLAY_MIRROR_Y, DISPLAY_SWAP_XY);
 
-    display_ = new SpiLcdDisplay(panel_io_, panel_,
-                                DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_OFFSET_X, DISPLAY_OFFSET_Y,
-                                DISPLAY_MIRROR_X, DISPLAY_MIRROR_Y, DISPLAY_SWAP_XY);
-}
-
-void SetPowerSaveLevel(PowerSaveLevel level) override {
-    if (display_ == nullptr || panel_ == nullptr) {
-        return;
     }
-
-    switch (level) {
-        case PowerSaveLevel::LOW_POWER:
-            // Display ausschalten
+/*
+virtual void SetPowerSaveMode(bool enable) override {
+    if (display_ != nullptr) {
+        // Get the underlying LCD panel handle from the display object
+        // (You may need to store panel_handle as a class member)
+        if (enable) {
+            // Turn off display content (screen saver)
             esp_lcd_panel_disp_on_off(panel_, false);
-            break;
-        case PowerSaveLevel::PERFORMANCE:
-        default:
-            // Display einschalten
+            // Optional: also put to sleep for less power
+            // esp_lcd_panel_disp_sleep(panel_, true);
+        } else {
+            // Wake up and show content again
             esp_lcd_panel_disp_sleep(panel_, false);
             esp_lcd_panel_disp_on_off(panel_, true);
-            break;
+            // Force a refresh of the UI
+            display_->Refresh();
+        }
     }
 }
-
-void InitializeButtons() {
+*/
+    void InitializeButtons() {
         boot_button_.OnClick([this]() {
             auto& app = Application::GetInstance();
             if (app.GetDeviceState() == kDeviceStateStarting) {
