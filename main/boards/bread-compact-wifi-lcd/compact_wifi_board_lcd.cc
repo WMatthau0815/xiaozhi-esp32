@@ -64,8 +64,6 @@ private:
  
     Button boot_button_;
     LcdDisplay* display_;
-    esp_lcd_panel_handle_t panel_ = nullptr;
-    esp_lcd_panel_io_handle_t panel_io_ = nullptr;
 
     void InitializeSpi() {
         spi_bus_config_t buscfg = {};
@@ -110,9 +108,7 @@ private:
 #else
         ESP_ERROR_CHECK(esp_lcd_new_panel_st7789(panel_io, &panel_config, &panel));
 #endif
-            // Save handles to class members
-        panel_io_ = panel_io;
-        panel_ = panel;
+        
         esp_lcd_panel_reset(panel);
 
         esp_lcd_panel_init(panel);
@@ -127,49 +123,26 @@ private:
 
     }
 /*
-void SetPowerSaveLevel(PowerSaveLevel level) override {
-    if (display_ == nullptr || panel_ == nullptr) {
-        return;
-    }
-
-    switch (level) {
-        case PowerSaveLevel::LOW_POWER:
-            // Turn display off for low power
+virtual void SetPowerSaveMode(bool enable) override {
+    if (display_ != nullptr) {
+        // Get the underlying LCD panel handle from the display object
+        // (You may need to store panel_handle as a class member)
+        if (enable) {
+            // Turn off display content (screen saver)
             esp_lcd_panel_disp_on_off(panel_, false);
-            break;
-        case PowerSaveLevel::PERFORMANCE:
-        default:
-            // Turn display on for performance mode
+            // Optional: also put to sleep for less power
+            // esp_lcd_panel_disp_sleep(panel_, true);
+        } else {
+            // Wake up and show content again
             esp_lcd_panel_disp_sleep(panel_, false);
             esp_lcd_panel_disp_on_off(panel_, true);
-            break;
+            // Force a refresh of the UI
+            display_->Refresh();
+        }
     }
 }
 */
-void SetPowerSaveLevel(PowerSaveLevel level) override {
-    #define TAG "LCD_Board: "
-    ESP_LOGI(TAG, "SetPowerSaveLevel called with level: %d", (int)level);
-    
-    if (display_ == nullptr || panel_ == nullptr) {
-        ESP_LOGW(TAG, "display_ or panel_ is null!");
-        return;
-    }
-
-    switch (level) {
-        case PowerSaveLevel::LOW_POWER:
-            ESP_LOGI(TAG, "Turning display OFF");
-            esp_lcd_panel_disp_on_off(panel_, true);
-            break;
-        case PowerSaveLevel::PERFORMANCE:
-        default:
-            ESP_LOGI(TAG, "Turning display ON");
-            esp_lcd_panel_disp_sleep(panel_, true);
-            esp_lcd_panel_disp_on_off(panel_, false);
-            break;
-    }
-}
-
-void InitializeButtons() {
+    void InitializeButtons() {
         boot_button_.OnClick([this]() {
             auto& app = Application::GetInstance();
             if (app.GetDeviceState() == kDeviceStateStarting) {
