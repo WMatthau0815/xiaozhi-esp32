@@ -165,7 +165,10 @@ void InitializeTools() {
 }
 public:
     CompactWifiBoardLCD() :
-        boot_button_(BOOT_BUTTON_GPIO) {
+        boot_button_(BOOT_BUTTON_GPIO),
+        display_(nullptr),
+        panel_(nullptr),
+        panel_io_(nullptr) {
         InitializeSpi();
         InitializeLcdDisplay();
         InitializeButtons();
@@ -173,7 +176,6 @@ public:
         if (DISPLAY_BACKLIGHT_PIN != GPIO_NUM_NC) {
             GetBacklight()->RestoreBrightness();
         }
-        
     }
 
 virtual Led* GetLed() override {
