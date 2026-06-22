@@ -122,27 +122,26 @@ private:
                                     DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_OFFSET_X, DISPLAY_OFFSET_Y, DISPLAY_MIRROR_X, DISPLAY_MIRROR_Y, DISPLAY_SWAP_XY);
 
     }
-/*
-virtual void SetPowerSaveMode(bool enable) override {
-    if (display_ != nullptr) {
-        // Get the underlying LCD panel handle from the display object
-        // (You may need to store panel_handle as a class member)
-        if (enable) {
-            // Turn off display content (screen saver)
+
+void SetPowerSaveLevel(PowerSaveLevel level) override {
+    if (display_ == nullptr || panel_ == nullptr) {
+        return;
+    }
+
+    switch (level) {
+        case PowerSaveLevel::LOW_POWER:
+            // Display AUS (Display Output OFF)
             esp_lcd_panel_disp_on_off(panel_, false);
-            // Optional: also put to sleep for less power
-            // esp_lcd_panel_disp_sleep(panel_, true);
-        } else {
-            // Wake up and show content again
-            esp_lcd_panel_disp_sleep(panel_, false);
+            break;
+        case PowerSaveLevel::PERFORMANCE:
+        default:
+            // Display AN (Display Output ON)
             esp_lcd_panel_disp_on_off(panel_, true);
-            // Force a refresh of the UI
-            display_->Refresh();
-        }
+            break;
     }
 }
-*/
-    void InitializeButtons() {
+
+void InitializeButtons() {
         boot_button_.OnClick([this]() {
             auto& app = Application::GetInstance();
             if (app.GetDeviceState() == kDeviceStateStarting) {
