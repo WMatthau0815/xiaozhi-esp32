@@ -126,7 +126,7 @@ private:
                                     DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_OFFSET_X, DISPLAY_OFFSET_Y, DISPLAY_MIRROR_X, DISPLAY_MIRROR_Y, DISPLAY_SWAP_XY);
 
     }
-
+/*
 void SetPowerSaveLevel(PowerSaveLevel level) override {
     if (display_ == nullptr || panel_ == nullptr) {
         return;
@@ -140,6 +140,29 @@ void SetPowerSaveLevel(PowerSaveLevel level) override {
         case PowerSaveLevel::PERFORMANCE:
         default:
             // Turn display on for performance mode
+            esp_lcd_panel_disp_sleep(panel_, false);
+            esp_lcd_panel_disp_on_off(panel_, true);
+            break;
+    }
+}
+*/
+void SetPowerSaveLevel(PowerSaveLevel level) override {
+    #define TAG "LCD_Board: "
+    ESP_LOGI(TAG, "SetPowerSaveLevel called with level: %d", (int)level);
+    
+    if (display_ == nullptr || panel_ == nullptr) {
+        ESP_LOGW(TAG, "display_ or panel_ is null!");
+        return;
+    }
+
+    switch (level) {
+        case PowerSaveLevel::LOW_POWER:
+            ESP_LOGI(TAG, "Turning display OFF");
+            esp_lcd_panel_disp_on_off(panel_, false);
+            break;
+        case PowerSaveLevel::PERFORMANCE:
+        default:
+            ESP_LOGI(TAG, "Turning display ON");
             esp_lcd_panel_disp_sleep(panel_, false);
             esp_lcd_panel_disp_on_off(panel_, true);
             break;
