@@ -129,6 +129,8 @@ private:
     }
 
 void SetPowerSaveLevel(PowerSaveLevel level) override {
+    ESP_LOGI("LCD_CALL: ", "SetPowerSaveLevel=%d display_=%p panel_=%p", (int)level, display_, panel_);
+
     if (display_ == nullptr || panel_ == nullptr) {
         return;
     }
