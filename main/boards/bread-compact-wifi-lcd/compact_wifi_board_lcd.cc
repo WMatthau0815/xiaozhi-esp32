@@ -64,6 +64,8 @@ private:
  
     Button boot_button_;
     LcdDisplay* display_;
+    esp_lcd_panel_handle_t panel_ = nullptr;
+    esp_lcd_panel_io_handle_t panel_io_ = nullptr;
 
     void InitializeSpi() {
         spi_bus_config_t buscfg = {};
