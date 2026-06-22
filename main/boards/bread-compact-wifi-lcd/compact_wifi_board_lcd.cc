@@ -128,7 +128,7 @@ private:
         panel_io_ = panel_io;
         lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_STATE_DEFAULT);
     }
-
+/*
 void SetPowerSaveLevel(PowerSaveLevel level) override {
     if (display_ == nullptr || panel_ == nullptr) {
         return;
@@ -152,6 +152,7 @@ void SetPowerSaveLevel(PowerSaveLevel level) override {
     // LVGL sofort aktualisieren
     lv_refr_now(NULL);
 }
+*/
 
 void InitializeButtons() {
         boot_button_.OnClick([this]() {
