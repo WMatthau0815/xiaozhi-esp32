@@ -8,6 +8,7 @@
 #include "mcp_server.h"
 #include "lamp_controller.h"
 #include "led/single_led.h"
+#include "lvgl.h"
 
 #include <esp_log.h>
 #include <driver/i2c_master.h>
@@ -129,19 +130,28 @@ private:
     }
 
 void SetPowerSaveLevel(PowerSaveLevel level) override {
-    if (display_ == nullptr || panel_ == nullptr) return;
-
-    switch (level) {
-        case PowerSaveLevel::LOW_POWER:
-            esp_lcd_panel_disp_on_off(panel_, false);
-            break;
-        case PowerSaveLevel::PERFORMANCE:
-        default:
-            esp_lcd_panel_disp_on_off(panel_, true);
-            break;
+    if (display_ == nullptr || panel_ == nullptr) {
+        return;
     }
-}
+    if (level == PowerSaveLevel::LOW_POWER) {
+        // UI Farben setzen (optional)
+        lv_disp_set_bg_color(lv_disp_get_default(), lv_color_hex(0x000000));
+        lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0xFFFFFF), 0);
 
+        // Panel wirklich aus
+        esp_lcd_panel_disp_on_off(panel_, false);
+        return;
+    }
+    // PERFORMANCE
+    esp_lcd_panel_disp_on_off(panel_, true);
+
+    // UI Farben setzen
+    lv_disp_set_bg_color(lv_disp_get_default(), lv_color_hex(0xFFFFFF));
+    lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0x000000), 0);
+
+    // LVGL sofort aktualisieren
+    lv_refr_now(NULL);
+}
 
 void InitializeButtons() {
         boot_button_.OnClick([this]() {
