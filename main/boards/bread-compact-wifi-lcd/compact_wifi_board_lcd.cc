@@ -125,28 +125,36 @@ private:
         // ⚠️ WICHTIG: Member-Variablen speichern
         panel_ = panel;
         panel_io_ = panel_io;
-        
+        lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_STATE_DEFAULT);
     }
 
 void SetPowerSaveLevel(PowerSaveLevel level) override {
-    ESP_LOGI("LCD_CALL: ", "SetPowerSaveLevel=%d display_=%p panel_=%p", (int)level, display_, panel_);
-
     if (display_ == nullptr || panel_ == nullptr) {
         return;
     }
 
-    switch (level) {
-        case PowerSaveLevel::LOW_POWER:
-            // Display AUS (Display Output OFF)
-            esp_lcd_panel_disp_on_off(panel_, false);
-            break;
-        case PowerSaveLevel::PERFORMANCE:
-        default:
-            // Display AN (Display Output ON)
-            esp_lcd_panel_disp_on_off(panel_, true);
-            break;
+    if (level == PowerSaveLevel::LOW_POWER) {
+        // UI auf dunkel stellen (falls es weiter rendert)
+        display_->SetTheme("dark");
+
+        // Display wirklich ausschalten (wichtig gegen Einbrennen)
+        esp_lcd_panel_disp_on_off(panel_, false);
+
+        // Optional: UI einmal auf schwarz setzen (falls dein Theme/Render das unterstützt)
+        // display_->FillScreen(0x0000);
+        // display_->Refresh();
+    } else {
+        // Display wieder einschalten
+        esp_lcd_panel_disp_on_off(panel_, true);
+
+        // UI auf hell stellen
+        display_->SetTheme("light");
+
+        // Optional: UI einmal frisch zeichnen, falls ihr in LOW_POWER nicht rendert
+        // display_->Refresh();
     }
 }
+
 
 void InitializeButtons() {
         boot_button_.OnClick([this]() {
