@@ -158,13 +158,13 @@ void SetPowerSaveLevel(PowerSaveLevel level) override {
     switch (level) {
         case PowerSaveLevel::LOW_POWER:
             ESP_LOGI(TAG, "Turning display OFF");
-            esp_lcd_panel_disp_on_off(panel_, false);
+            esp_lcd_panel_disp_on_off(panel_, true);
             break;
         case PowerSaveLevel::PERFORMANCE:
         default:
             ESP_LOGI(TAG, "Turning display ON");
-            esp_lcd_panel_disp_sleep(panel_, false);
-            esp_lcd_panel_disp_on_off(panel_, true);
+            esp_lcd_panel_disp_sleep(panel_, true);
+            esp_lcd_panel_disp_on_off(panel_, false);
             break;
     }
 }
