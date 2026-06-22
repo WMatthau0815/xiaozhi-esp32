@@ -126,26 +126,24 @@ void InitializeLcdDisplay() {
     display_ = new SpiLcdDisplay(panel_io_, panel_,
                                 DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_OFFSET_X, DISPLAY_OFFSET_Y,
                                 DISPLAY_MIRROR_X, DISPLAY_MIRROR_Y, DISPLAY_SWAP_XY);
-        // 🆕 Display beim Start immer einschalten
-    if (panel_ != nullptr) {
-        esp_lcd_panel_disp_on_off(panel_, true);
-    }
 }
 
-void SetPowerSaveMode(bool enable) {
-    // Während des Bootvorgangs (display_ ist noch nicht initialisiert) -> nichts tun
+void SetPowerSaveLevel(PowerSaveLevel level) override {
     if (display_ == nullptr || panel_ == nullptr) {
         return;
     }
 
-    if (enable) {
-        // Nur wenn wirklich im Leerlauf (nach Konversation)
-        esp_lcd_panel_disp_on_off(panel_, false);
-        // Optional: esp_lcd_panel_disp_sleep(panel_, true);
-    } else {
-        // Aufwecken (auch beim Start)
-        esp_lcd_panel_disp_sleep(panel_, false);
-        esp_lcd_panel_disp_on_off(panel_, true);
+    switch (level) {
+        case PowerSaveLevel::LOW_POWER:
+            // Display ausschalten
+            esp_lcd_panel_disp_on_off(panel_, false);
+            break;
+        case PowerSaveLevel::PERFORMANCE:
+        default:
+            // Display einschalten
+            esp_lcd_panel_disp_sleep(panel_, false);
+            esp_lcd_panel_disp_on_off(panel_, true);
+            break;
     }
 }
 
