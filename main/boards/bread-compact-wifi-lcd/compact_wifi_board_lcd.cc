@@ -64,6 +64,8 @@ private:
  
     Button boot_button_;
     LcdDisplay* display_;
+    esp_lcd_panel_handle_t panel_;      // Muss vorhanden sein
+    esp_lcd_panel_io_handle_t panel_io_; // Optional, für manuelle Befehle
 
     void InitializeSpi() {
         spi_bus_config_t buscfg = {};
@@ -120,7 +122,10 @@ private:
 #endif
         display_ = new SpiLcdDisplay(panel_io, panel,
                                     DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_OFFSET_X, DISPLAY_OFFSET_Y, DISPLAY_MIRROR_X, DISPLAY_MIRROR_Y, DISPLAY_SWAP_XY);
-
+        // ⚠️ WICHTIG: Member-Variablen speichern
+        panel_ = panel;
+        panel_io_ = panel_io;
+        
     }
 
 void SetPowerSaveLevel(PowerSaveLevel level) override {
