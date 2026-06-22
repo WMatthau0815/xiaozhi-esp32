@@ -110,7 +110,9 @@ private:
 #else
         ESP_ERROR_CHECK(esp_lcd_new_panel_st7789(panel_io, &panel_config, &panel));
 #endif
-        
+            // Save handles to class members
+        panel_io_ = panel_io;
+        panel_ = panel;
         esp_lcd_panel_reset(panel);
 
         esp_lcd_panel_init(panel);
@@ -132,14 +134,12 @@ void SetPowerSaveLevel(PowerSaveLevel level) override {
 
     switch (level) {
         case PowerSaveLevel::LOW_POWER:
-        case PowerSaveLevel::SLEEP:
-        case PowerSaveLevel::STANDBY:
-            // Display ausschalten (alle Energiesparmodi)
+            // Turn display off for low power
             esp_lcd_panel_disp_on_off(panel_, false);
             break;
         case PowerSaveLevel::PERFORMANCE:
         default:
-            // Display einschalten (Konversation)
+            // Turn display on for performance mode
             esp_lcd_panel_disp_sleep(panel_, false);
             esp_lcd_panel_disp_on_off(panel_, true);
             break;
