@@ -271,10 +271,11 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
 //                    int h = DISPLAY_HEIGHT;
                     int icon_w = lv_obj_get_width(disp->emotion_img_);
                     int icon_h = lv_obj_get_height(disp->emotion_img_);
-                    if (icon_w <= 0) icon_w = 100;
-                    if (icon_h <= 0) icon_h = 100;
+                    ESP_LOGI("SCREENSAVER", "icon_w=%d, icon_h=%d, w=%d, h=%d", icon_w, icon_h, w, h);
+                    if (icon_w <= 0) icon_w = 50;
+                    if (icon_h <= 0) icon_h = 50;
 
-                    int margin = 20;
+                    int margin = 50;
                     int max_x = w - icon_w - margin;
                     int max_y = h - icon_h - margin;
                     if (max_x < margin) max_x = margin;
