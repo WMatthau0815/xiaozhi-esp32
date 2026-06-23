@@ -269,6 +269,10 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
                     ESP_LOGI("SCREENSAVER", "Icon centered at (%d, %d)", lv_obj_get_x(disp->emotion_img_), lv_obj_get_y(disp->emotion_img_));
                     lv_obj_set_parent(disp->emotion_img_, lv_scr_act());
 
+                                // Alle Ausrichtungen und Ränder zurücksetzen
+                    lv_obj_set_style_align(disp->emotion_img_, LV_ALIGN_DEFAULT, 0);
+                    lv_obj_set_style_margin_all(disp->emotion_img_, 0, 0);
+
                     int w = lv_disp_get_hor_res(lv_disp_get_default());
                     int h = lv_disp_get_ver_res(lv_disp_get_default());
 
