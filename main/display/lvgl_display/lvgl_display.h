@@ -13,6 +13,8 @@
 #include <chrono>
 
 class LvglDisplay : public Display {
+private:
+    lv_timer_t* move_timer_ = nullptr;
 public:
     LvglDisplay();
     virtual ~LvglDisplay();
