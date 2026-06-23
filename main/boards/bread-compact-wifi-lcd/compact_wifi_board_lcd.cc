@@ -9,6 +9,7 @@
 #include "lamp_controller.h"
 #include "led/single_led.h"
 #include "lvgl.h"
+#include "power_save_timer.h"
 
 #include <esp_log.h>
 #include <driver/i2c_master.h>
@@ -67,6 +68,7 @@ private:
     LcdDisplay* display_;
     esp_lcd_panel_handle_t panel_;      // Muss vorhanden sein
     esp_lcd_panel_io_handle_t panel_io_; // Optional, für manuelle Befehle
+    PowerSaveTimer* power_save_timer_ = nullptr;
 
     void InitializeSpi() {
         spi_bus_config_t buscfg = {};
@@ -153,6 +155,23 @@ void SetPowerSaveLevel(PowerSaveLevel level) override {
     lv_refr_now(NULL);
 }
 */
+void InitializePowerSaveTimer() {
+    power_save_timer_ = new PowerSaveTimer(-1, 60, -1);
+    power_save_timer_->OnEnterSleepMode([this]() {
+        GetDisplay()->SetPowerSaveMode(true);
+        if (auto* backlight = GetBacklight()) {
+            backlight->SetBrightness(1);
+        }
+    });
+    power_save_timer_->OnExitSleepMode([this]() {
+        GetDisplay()->SetPowerSaveMode(false);
+        if (auto* backlight = GetBacklight()) {
+            backlight->RestoreBrightness();
+        }
+    });
+    power_save_timer_->SetEnabled(true);
+}
+
 
 void InitializeButtons() {
         boot_button_.OnClick([this]() {
@@ -177,13 +196,18 @@ public:
         display_(nullptr),
         panel_(nullptr),
         panel_io_(nullptr) {
-        InitializeSpi();
-        InitializeLcdDisplay();
-        InitializeButtons();
-        InitializeTools();
-        if (DISPLAY_BACKLIGHT_PIN != GPIO_NUM_NC) {
-            GetBacklight()->RestoreBrightness();
+            InitializeSpi();
+            InitializeLcdDisplay();
+            InitializePowerSaveTimer();   // <--- add this line
+            InitializeButtons();
+            InitializeTools();
+            if (DISPLAY_BACKLIGHT_PIN != GPIO_NUM_NC) {
+                GetBacklight()->RestoreBrightness();
+            }
         }
+    // 👇 Add this destructor
+    ~CompactWifiBoardLCD() {
+        delete power_save_timer_;
     }
 
 virtual Led* GetLed() override {
