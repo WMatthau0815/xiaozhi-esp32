@@ -12,7 +12,7 @@
 #include "settings.h"
 #include "assets/lang_config.h"
 #include "jpg/image_to_jpeg.h"
-#include "boards/bread-compact-wifi-lcd/config.h"
+//#include "boards/bread-compact-wifi-lcd/config.h"
 
 #define TAG "Display"
 
@@ -265,10 +265,10 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
             move_timer_ = lv_timer_create([](lv_timer_t* timer) {
                 auto* disp = static_cast<LvglDisplay*>(lv_timer_get_user_data(timer));
                 if (disp && disp->emotion_img_) {
-//                    int w = lv_obj_get_width(lv_scr_act());
-//                    int h = lv_obj_get_height(lv_scr_act());
-                    int w = DISPLAY_WIDTH;
-                    int h = DISPLAY_HEIGHT;
+                    int w = lv_obj_get_width(lv_scr_act());
+                    int h = lv_obj_get_height(lv_scr_act());
+//                    int w = DISPLAY_WIDTH;
+//                    int h = DISPLAY_HEIGHT;
                     int icon_w = lv_obj_get_width(disp->emotion_img_);
                     int icon_h = lv_obj_get_height(disp->emotion_img_);
                     if (icon_w <= 0) icon_w = 100;
