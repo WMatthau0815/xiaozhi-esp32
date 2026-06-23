@@ -15,6 +15,8 @@
 class LvglDisplay : public Display {
 private:
     lv_timer_t* move_timer_ = nullptr;
+    lv_obj_t* emotion_img_ = nullptr;
+
 public:
     LvglDisplay();
     virtual ~LvglDisplay();
