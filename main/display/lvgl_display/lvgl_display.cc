@@ -271,6 +271,10 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
                     int x = margin + esp_random() % (max_x - margin + 1);
                     int y = margin + esp_random() % (max_y - margin + 1);
                     lv_obj_set_pos(disp->emotion_img_, x, y);
+                    ESP_LOGI("SCREENSAVER", "Smiley moved to (%d, %d)", x, y);  // <-- HIER
+                }
+                else {
+                  ESP_LOGW("SCREENSAVER", "emotion_img_ is null!");
                 }
             }, 2000, this);
         }
