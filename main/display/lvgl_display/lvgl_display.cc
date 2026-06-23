@@ -38,6 +38,10 @@ LvglDisplay::LvglDisplay() {
     } else {
         ESP_ERROR_CHECK(ret);
     }
+    if (move_timer_) {
+      lv_timer_del(move_timer_);
+      move_timer_ = nullptr;
+    }
 }
 
 LvglDisplay::~LvglDisplay() {
@@ -238,7 +242,7 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
         SetChatMessage("system", "");
         SetEmotion("sleepy");
 
-        // Header ausblenden (WLAN-Symbol + Uhrzeit)
+        // Header ausblenden
         if (network_label_) lv_obj_add_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
         if (status_label_) lv_obj_add_flag(status_label_, LV_OBJ_FLAG_HIDDEN);
 
@@ -264,15 +268,29 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
                     int y = margin + esp_random() % (max_y - margin + 1);
                     lv_obj_set_pos(disp->emotion_img_, x, y);
                 }
-            }, 2000, this); // alle 2 Sekunden
+            }, 2000, this);
         }
     } else {
         // Normalzustand (aktive Konversation)
+        // Timer stoppen und löschen
+        if (move_timer_) {
+            lv_timer_del(move_timer_);
+            move_timer_ = nullptr;
+        }
+
         SetChatMessage("system", "");
         SetEmotion("neutral");
+
+        // Header wieder einblenden
+        if (network_label_) lv_obj_clear_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
+        if (status_label_) lv_obj_clear_flag(status_label_, LV_OBJ_FLAG_HIDDEN);
+
+        // Smiley wieder zentrieren
+        if (emotion_img_) {
+            lv_obj_center(emotion_img_);
+        }
     }
 }
-
 bool LvglDisplay::SnapshotToJpeg(std::string& jpeg_data, int quality) {
 #if CONFIG_LV_USE_SNAPSHOT
     DisplayLockGuard lock(this);
