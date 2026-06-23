@@ -12,7 +12,7 @@
 #include "settings.h"
 #include "assets/lang_config.h"
 #include "jpg/image_to_jpeg.h"
-#include "config.h"
+#include "boards/bread-compact-wifi-lcd/config.h"
 
 #define TAG "Display"
 
