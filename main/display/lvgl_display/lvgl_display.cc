@@ -119,6 +119,9 @@ void LvglDisplay::ShowNotification(const char* notification, int duration_ms) {
 }
 
 void LvglDisplay::UpdateStatusBar(bool update_all) {
+    if (power_save_on_) {
+        return;  // Im Sleep-Modus keine Uhrzeit aktualisieren
+    }
     auto& app = Application::GetInstance();
     auto& board = Board::GetInstance();
     auto codec = board.GetAudioCodec();
@@ -241,17 +244,22 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
 */
 
 void LvglDisplay::SetPowerSaveMode(bool on) {
-        ESP_LOGI("SCREENSAVER", "SetPowerSaveMode called with on=%d", on);
+    ESP_LOGI("SCREENSAVER", "SetPowerSaveMode called with on=%d", on);
+
+    power_save_on_ = on;  // Flag setzen
+
     if (on) {
-        // Ruhezustand (Bildschirmschoner)
+        // Ruhezustand
         SetChatMessage("system", "");
         SetEmotion("sleepy");
 
-        // Header ausblenden
+        // Header komplett ausblenden
         if (network_label_) lv_obj_add_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
         if (status_label_) lv_obj_add_flag(status_label_, LV_OBJ_FLAG_HIDDEN);
+        if (battery_label_) lv_obj_add_flag(battery_label_, LV_OBJ_FLAG_HIDDEN);
+        if (mute_label_) lv_obj_add_flag(mute_label_, LV_OBJ_FLAG_HIDDEN);
 
-        // Timer starten: Smiley alle 2 Sekunden zufällig bewegen
+        // Timer starten (Smiley bewegen)
         if (!move_timer_) {
             move_timer_ = lv_timer_create([](lv_timer_t* timer) {
                 auto* disp = static_cast<LvglDisplay*>(lv_timer_get_user_data(timer));
@@ -272,16 +280,12 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
                     int x = margin + esp_random() % (max_x - margin + 1);
                     int y = margin + esp_random() % (max_y - margin + 1);
                     lv_obj_set_pos(disp->emotion_img_, x, y);
-                    ESP_LOGI("SCREENSAVER", "Smiley moved to (%d, %d)", x, y);  // <-- HIER
-                }
-                else {
-                  ESP_LOGW("SCREENSAVER", "emotion_img_ is null!");
                 }
             }, 2000, this);
         }
     } else {
-        // Normalzustand (aktive Konversation)
-        // Timer stoppen und löschen
+        // Normalzustand
+        // Timer stoppen
         if (move_timer_) {
             lv_timer_del(move_timer_);
             move_timer_ = nullptr;
@@ -293,13 +297,16 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
         // Header wieder einblenden
         if (network_label_) lv_obj_clear_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
         if (status_label_) lv_obj_clear_flag(status_label_, LV_OBJ_FLAG_HIDDEN);
+        if (battery_label_) lv_obj_clear_flag(battery_label_, LV_OBJ_FLAG_HIDDEN);
+        if (mute_label_) lv_obj_clear_flag(mute_label_, LV_OBJ_FLAG_HIDDEN);
 
-        // Smiley wieder zentrieren
+        // Smiley zentrieren
         if (emotion_img_) {
             lv_obj_center(emotion_img_);
         }
     }
 }
+
 bool LvglDisplay::SnapshotToJpeg(std::string& jpeg_data, int quality) {
 #if CONFIG_LV_USE_SNAPSHOT
     DisplayLockGuard lock(this);
