@@ -28,6 +28,8 @@ public:
     virtual void UpdateStatusBar(bool update_all = false);
     virtual void SetPowerSaveMode(bool on);
     virtual bool SnapshotToJpeg(std::string& jpeg_data, int quality = 80);
+    // Register the LVGL object that the screensaver should move
+    void SetScreensaverObject(lv_obj_t* obj) { emotion_img_ = obj; }
 
 protected:
     esp_pm_lock_handle_t pm_lock_ = nullptr;
