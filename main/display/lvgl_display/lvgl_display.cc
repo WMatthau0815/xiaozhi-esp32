@@ -241,6 +241,7 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
 */
 
 void LvglDisplay::SetPowerSaveMode(bool on) {
+        ESP_LOGI("SCREENSAVER", "SetPowerSaveMode called with on=%d", on);
     if (on) {
         // Ruhezustand (Bildschirmschoner)
         SetChatMessage("system", "");
