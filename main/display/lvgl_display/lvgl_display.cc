@@ -294,26 +294,25 @@ if (!move_timer_) {
         }
     }, 2000, this);
 } else {
-        // Normalzustand
-        // Timer stoppen
-        if (move_timer_) {
-            lv_timer_del(move_timer_);
-            move_timer_ = nullptr;
-        }
+    // Normalzustand
+    // Timer stoppen
+    if (move_timer_) {
+        lv_timer_del(move_timer_);
+        move_timer_ = nullptr;
+    }
 
-        SetChatMessage("system", "");
-        SetEmotion("neutral");
+    SetChatMessage("system", "");
+    SetEmotion("neutral");
 
-        // Header wieder einblenden
-        if (network_label_) lv_obj_clear_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
-        if (status_label_) lv_obj_clear_flag(status_label_, LV_OBJ_FLAG_HIDDEN);
-        if (battery_label_) lv_obj_clear_flag(battery_label_, LV_OBJ_FLAG_HIDDEN);
-        if (mute_label_) lv_obj_clear_flag(mute_label_, LV_OBJ_FLAG_HIDDEN);
+    // Header wieder einblenden
+    if (network_label_) lv_obj_clear_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
+    if (status_label_) lv_obj_clear_flag(status_label_, LV_OBJ_FLAG_HIDDEN);
+    if (battery_label_) lv_obj_clear_flag(battery_label_, LV_OBJ_FLAG_HIDDEN);
+    if (mute_label_) lv_obj_clear_flag(mute_label_, LV_OBJ_FLAG_HIDDEN);
 
-        // Smiley zentrieren
-        if (emotion_img_) {
-            lv_obj_center(emotion_img_);
-        }
+    // Smiley zentrieren
+    if (emotion_img_) {
+        lv_obj_center(emotion_img_);
     }
 }
 
