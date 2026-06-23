@@ -220,12 +220,54 @@ void LvglDisplay::UpdateStatusBar(bool update_all) {
 
 void LvglDisplay::SetPreviewImage(std::unique_ptr<LvglImage> image) {
 }
-
+/*
 void LvglDisplay::SetPowerSaveMode(bool on) {
     if (on) {
         SetChatMessage("system", "");
         SetEmotion("sleepy");
     } else {
+        SetChatMessage("system", "");
+        SetEmotion("neutral");
+    }
+}
+*/
+
+void LvglDisplay::SetPowerSaveMode(bool on) {
+    if (on) {
+        // Ruhezustand (Bildschirmschoner)
+        SetChatMessage("system", "");
+        SetEmotion("sleepy");
+
+        // Header ausblenden (WLAN-Symbol + Uhrzeit)
+        if (network_label_) lv_obj_add_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
+        if (status_label_) lv_obj_add_flag(status_label_, LV_OBJ_FLAG_HIDDEN);
+
+        // Timer starten: Smiley alle 2 Sekunden zufällig bewegen
+        if (!move_timer_) {
+            move_timer_ = lv_timer_create([](lv_timer_t* timer) {
+                auto* disp = (LvglDisplay*)timer->user_data;
+                if (disp && disp->emotion_img_) {
+                    int w = lv_obj_get_width(lv_scr_act());
+                    int h = lv_obj_get_height(lv_scr_act());
+                    int icon_w = lv_obj_get_width(disp->emotion_img_);
+                    int icon_h = lv_obj_get_height(disp->emotion_img_);
+                    if (icon_w <= 0) icon_w = 100;
+                    if (icon_h <= 0) icon_h = 100;
+
+                    int margin = 20;
+                    int max_x = w - icon_w - margin;
+                    int max_y = h - icon_h - margin;
+                    if (max_x < margin) max_x = margin;
+                    if (max_y < margin) max_y = margin;
+
+                    int x = margin + esp_random() % (max_x - margin + 1);
+                    int y = margin + esp_random() % (max_y - margin + 1);
+                    lv_obj_set_pos(disp->emotion_img_, x, y);
+                }
+            }, 2000, this); // alle 2 Sekunden
+        }
+    } else {
+        // Normalzustand (aktive Konversation)
         SetChatMessage("system", "");
         SetEmotion("neutral");
     }
