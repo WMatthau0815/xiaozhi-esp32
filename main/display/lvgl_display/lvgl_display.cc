@@ -249,7 +249,7 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
         // Timer starten: Smiley alle 2 Sekunden zufällig bewegen
         if (!move_timer_) {
             move_timer_ = lv_timer_create([](lv_timer_t* timer) {
-                auto* disp = (LvglDisplay*)timer->user_data;
+                auto* disp = static_cast<LvglDisplay*>(lv_timer_get_user_data(timer));
                 if (disp && disp->emotion_img_) {
                     int w = lv_obj_get_width(lv_scr_act());
                     int h = lv_obj_get_height(lv_scr_act());
