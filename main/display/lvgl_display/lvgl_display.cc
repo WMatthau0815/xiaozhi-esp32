@@ -12,6 +12,7 @@
 #include "settings.h"
 #include "assets/lang_config.h"
 #include "jpg/image_to_jpeg.h"
+#include "config.h"
 
 #define TAG "Display"
 
