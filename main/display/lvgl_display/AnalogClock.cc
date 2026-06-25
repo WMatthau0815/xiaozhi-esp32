@@ -107,8 +107,8 @@ void AnalogClock::DrawFace(lv_obj_t* parent) {
     CalcHand(0, 84, min_pts_);
     CalcHand(0, 62, hr_pts_);
 
-    sec_hand_ = CreateHand(clock_container_, sec_pts_,    0xFF0000, 1);
-    sec_cw_   = CreateHand(clock_container_, sec_cw_pts_, 0xFF0000, 1);
+    sec_hand_ = CreateHand(clock_container_, sec_pts_,    0xFF0000, 2);
+    sec_cw_   = CreateHand(clock_container_, sec_cw_pts_, 0xFF0000, 2);
     min_hand_ = CreateHand(clock_container_, min_pts_,    0xFFFFFF, 2);
     hr_hand_  = CreateHand(clock_container_, hr_pts_,     0xFFFFFF, 3);
 
