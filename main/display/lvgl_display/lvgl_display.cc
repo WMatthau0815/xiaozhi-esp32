@@ -12,6 +12,7 @@
 #include "settings.h"
 #include "assets/lang_config.h"
 #include "jpg/image_to_jpeg.h"
+#include "analog_clock.h"
 //#include "boards/bread-compact-wifi-lcd/config.h"
 
 #define TAG "Display"
@@ -243,7 +244,7 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
     }
 }
 */
-
+/*
 void LvglDisplay::SetPowerSaveMode(bool on) {
     ESP_LOGI("SCREENSAVER", "SetPowerSaveMode called with on=%d", on);
 
@@ -317,6 +318,38 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
         if (emotion_img_) {
             lv_obj_center(emotion_img_);
         }
+    }
+}
+*/
+
+void LvglDisplay::SetPowerSaveMode(bool on) {
+    power_save_on_ = on;
+    if (on) {
+        // UI ausblenden
+        if (network_label_) lv_obj_add_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
+        if (status_label_)  lv_obj_add_flag(status_label_,  LV_OBJ_FLAG_HIDDEN);
+        if (battery_label_) lv_obj_add_flag(battery_label_, LV_OBJ_FLAG_HIDDEN);
+        if (mute_label_)    lv_obj_add_flag(mute_label_,    LV_OBJ_FLAG_HIDDEN);
+        if (emotion_img_)   lv_obj_add_flag(emotion_img_,   LV_OBJ_FLAG_HIDDEN);
+
+        // Uhr starten
+        AnalogClock::Start(lv_scr_act());
+
+    } else {
+        // Uhr stoppen
+        AnalogClock::Stop();
+
+        // UI wieder einblenden
+        if (network_label_) lv_obj_clear_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
+        if (status_label_)  lv_obj_clear_flag(status_label_,  LV_OBJ_FLAG_HIDDEN);
+        if (battery_label_) lv_obj_clear_flag(battery_label_, LV_OBJ_FLAG_HIDDEN);
+        if (mute_label_)    lv_obj_clear_flag(mute_label_,    LV_OBJ_FLAG_HIDDEN);
+        if (emotion_img_)   lv_obj_clear_flag(emotion_img_,   LV_OBJ_FLAG_HIDDEN);
+
+        SetEmotion("neutral");
+        SetChatMessage("system", "");
+
+        if (emotion_img_) lv_obj_center(emotion_img_);
     }
 }
 
