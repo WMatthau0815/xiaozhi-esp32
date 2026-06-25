@@ -238,6 +238,8 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
     ESP_LOGI("CLOCK", "SetPowerSaveMode called, on=%d", on);
  
     power_save_on_ = on;
+    DisplayLockGuard lock(this);  // ← das fehlte
+    
     if (on) {
         ESP_LOGI("CLOCK", "network_label_=%p status_label_=%p emotion_img_=%p", network_label_, status_label_, emotion_img_);
 
