@@ -255,8 +255,11 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
         ESP_LOGI("CLOCK", "AnalogClock started");
         
     } else {
-        // Uhr stoppen
+        ESP_LOGI("CLOCK", "Stopping AnalogClock...");
         AnalogClock::Stop();
+
+        // Screen neu zeichnen erzwingen
+        lv_obj_invalidate(lv_scr_act());
 
         // UI wieder einblenden
         if (network_label_) lv_obj_clear_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
