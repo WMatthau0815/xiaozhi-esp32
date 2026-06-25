@@ -258,11 +258,14 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
         ESP_LOGI("CLOCK", "Stopping AnalogClock...");
         AnalogClock::Stop();
 
-        // Screen-Hintergrund explizit zurücksetzen
-        lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), 0);
-        lv_obj_set_style_bg_opa(lv_scr_act(), LV_OPA_COVER, 0);
-    
+        // ← HIER: AnalogClock-Objekte komplett löschen
+        lv_obj_t* clock_obj = AnalogClock::GetClockObject(); // Falls diese Methode existiert
+        if (clock_obj != nullptr) {
+           lv_obj_del(clock_obj);
+        }
 
+        // Screen neu zeichnen erzwingen
+        lv_obj_invalidate(lv_scr_act());
 
         // UI wieder einblenden
         if (network_label_) lv_obj_clear_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
