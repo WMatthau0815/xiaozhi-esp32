@@ -258,14 +258,14 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
         ESP_LOGI("CLOCK", "Stopping AnalogClock...");
         AnalogClock::Stop();
 
-        // ← HIER: AnalogClock-Objekte komplett löschen
-        lv_obj_t* clock_obj = AnalogClock::GetClockObject(); // Falls diese Methode existiert
-        if (clock_obj != nullptr) {
-           lv_obj_del(clock_obj);
-        }
-
-        // Screen neu zeichnen erzwingen
-        lv_obj_invalidate(lv_scr_act());
+        // Den gesamten Screen clearing und neu aufbauen
+        lv_obj_clean(lv_scr_act());  // ← WICHTIG: Alle Objekte auf dem Screen löschen
+        
+        // Reset setup_ui_called_ Flag damit SetupUI erneut aufgerufen werden kann
+        setup_ui_called_ = false;
+        
+        // SetupUI erneut aufrufen um die WeChat-UI neu aufzubauen
+        SetupUI();
 
         // UI wieder einblenden
         if (network_label_) lv_obj_clear_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
@@ -276,7 +276,7 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
 
         SetEmotion("neutral");
         SetChatMessage("system", "");
-
+        SetStatus("");
         if (emotion_img_) lv_obj_center(emotion_img_);
     }
 }
