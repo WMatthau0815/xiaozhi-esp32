@@ -233,98 +233,14 @@ void LvglDisplay::UpdateStatusBar(bool update_all) {
 
 void LvglDisplay::SetPreviewImage(std::unique_ptr<LvglImage> image) {
 }
-/*
-void LvglDisplay::SetPowerSaveMode(bool on) {
-    if (on) {
-        SetChatMessage("system", "");
-        SetEmotion("sleepy");
-    } else {
-        SetChatMessage("system", "");
-        SetEmotion("neutral");
-    }
-}
-*/
-/*
-void LvglDisplay::SetPowerSaveMode(bool on) {
-    ESP_LOGI("SCREENSAVER", "SetPowerSaveMode called with on=%d", on);
-
-    power_save_on_ = on;  // Flag setzen
-
-    if (on) {
-        // Ruhezustand
-        SetChatMessage("system", "");
-        SetEmotion("sleepy");
-
-        // Header komplett ausblenden
-        if (network_label_) lv_obj_add_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
-        if (status_label_) lv_obj_add_flag(status_label_, LV_OBJ_FLAG_HIDDEN);
-        if (battery_label_) lv_obj_add_flag(battery_label_, LV_OBJ_FLAG_HIDDEN);
-        if (mute_label_) lv_obj_add_flag(mute_label_, LV_OBJ_FLAG_HIDDEN);
-
-        // Timer starten (Smiley bewegen)
-        if (!move_timer_) {
-            move_timer_ = lv_timer_create([](lv_timer_t* timer) {
-                auto* disp = static_cast<LvglDisplay*>(lv_timer_get_user_data(timer));
-                if (disp && disp->emotion_img_) {
-                    ESP_LOGI("SCREENSAVER", "Parent is screen? %d", lv_obj_get_parent(disp->emotion_img_) == lv_scr_act());
-                    ESP_LOGI("SCREENSAVER", "Icon centered at (%d, %d)", lv_obj_get_x(disp->emotion_img_), lv_obj_get_y(disp->emotion_img_));
-                    lv_obj_set_parent(disp->emotion_img_, lv_scr_act());
-
-                                // Alle Ausrichtungen und Ränder zurücksetzen
-                    lv_obj_set_style_align(disp->emotion_img_, LV_ALIGN_DEFAULT, 0);
-                    lv_obj_set_style_margin_all(disp->emotion_img_, 0, 0);
-
-                    int w = lv_disp_get_hor_res(lv_disp_get_default());
-                    int h = lv_disp_get_ver_res(lv_disp_get_default());
-
-                    int icon_w = lv_obj_get_width(disp->emotion_img_);
-                    int icon_h = lv_obj_get_height(disp->emotion_img_);
-                    if (icon_w <= 0) icon_w = 50;
-                    if (icon_h <= 0) icon_h = 50;
-
-                    int margin = 20;
-                    int max_x = w - icon_w - margin;
-                    int max_y = h - icon_h - margin;
-                    if (max_x < margin) max_x = margin;
-                    if (max_y < margin) max_y = margin;
-
-                    int x = margin + esp_random() % (max_x - margin + 1);
-                    int y = margin + esp_random() % (max_y - margin + 1);
-
-                    ESP_LOGI("SCREENSAVER", "w=%d, h=%d, x=%d, y=%d", w, h, x, y);
-
-                    lv_obj_set_pos(disp->emotion_img_, x, y);
-                }
-            }, 2000, this);
-        }
-    } else {
-        // Normalzustand (on == false)
-        // Timer stoppen
-        if (move_timer_) {
-            lv_timer_del(move_timer_);
-            move_timer_ = nullptr;
-        }
-
-        SetChatMessage("system", "");
-        SetEmotion("neutral");
-
-        // Header wieder einblenden
-        if (network_label_) lv_obj_clear_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
-        if (status_label_) lv_obj_clear_flag(status_label_, LV_OBJ_FLAG_HIDDEN);
-        if (battery_label_) lv_obj_clear_flag(battery_label_, LV_OBJ_FLAG_HIDDEN);
-        if (mute_label_) lv_obj_clear_flag(mute_label_, LV_OBJ_FLAG_HIDDEN);
-
-        // Smiley zentrieren
-        if (emotion_img_) {
-            lv_obj_center(emotion_img_);
-        }
-    }
-}
-*/
 
 void LvglDisplay::SetPowerSaveMode(bool on) {
+    ESP_LOGI("CLOCK", "SetPowerSaveMode called, on=%d", on);
+ 
     power_save_on_ = on;
     if (on) {
+        ESP_LOGI("CLOCK", "network_label_=%p status_label_=%p emotion_img_=%p", network_label_, status_label_, emotion_img_);
+
         // UI ausblenden
         if (network_label_) lv_obj_add_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
         if (status_label_)  lv_obj_add_flag(status_label_,  LV_OBJ_FLAG_HIDDEN);
@@ -332,9 +248,10 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
         if (mute_label_)    lv_obj_add_flag(mute_label_,    LV_OBJ_FLAG_HIDDEN);
         if (emotion_img_)   lv_obj_add_flag(emotion_img_,   LV_OBJ_FLAG_HIDDEN);
 
-        // Uhr starten
+        ESP_LOGI("CLOCK", "Starting AnalogClock...");
         AnalogClock::Start(lv_scr_act());
-
+        ESP_LOGI("CLOCK", "AnalogClock started");
+        
     } else {
         // Uhr stoppen
         AnalogClock::Stop();
