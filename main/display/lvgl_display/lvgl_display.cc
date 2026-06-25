@@ -258,27 +258,33 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
         ESP_LOGI("CLOCK", "Stopping AnalogClock...");
         AnalogClock::Stop();
 
-        // Den gesamten Screen clearing und neu aufbauen
-        lv_obj_clean(lv_scr_act());  // ← WICHTIG: Alle Objekte auf dem Screen löschen
+        // Den gesamten Screen clearing 
+        lv_obj_clean(lv_scr_act());
+        
+        // Nullifiziere alle UI-Element Pointer nach dem Löschen
+        network_label_ = nullptr;
+        status_label_ = nullptr;
+        battery_label_ = nullptr;
+        mute_label_ = nullptr;
+        notification_label_ = nullptr;
+        emotion_img_ = nullptr;
+        low_battery_popup_ = nullptr;
+        low_battery_label_ = nullptr;
         
         // Reset setup_ui_called_ Flag damit SetupUI erneut aufgerufen werden kann
         setup_ui_called_ = false;
         
         // SetupUI erneut aufrufen um die WeChat-UI neu aufzubauen
+        // Dies wird alle Pointer neu initialisieren
         SetupUI();
 
-        // UI wieder einblenden
-        if (network_label_) lv_obj_clear_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
-        if (status_label_)  lv_obj_clear_flag(status_label_,  LV_OBJ_FLAG_HIDDEN);
-        if (battery_label_) lv_obj_clear_flag(battery_label_, LV_OBJ_FLAG_HIDDEN);
-        if (mute_label_)    lv_obj_clear_flag(mute_label_,    LV_OBJ_FLAG_HIDDEN);
-        if (emotion_img_)   lv_obj_clear_flag(emotion_img_,   LV_OBJ_FLAG_HIDDEN);
-
+        // Standard-Status wieder setzen
         SetEmotion("neutral");
         SetChatMessage("system", "");
         SetStatus("");
+        
         if (emotion_img_) lv_obj_center(emotion_img_);
-    }
+   }
 }
 
 bool LvglDisplay::SnapshotToJpeg(std::string& jpeg_data, int quality) {
