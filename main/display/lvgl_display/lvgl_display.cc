@@ -241,6 +241,8 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
     DisplayLockGuard lock(this);  // ← das fehlte
     
     if (on) {
+        DisplayLockGuard lock(this);
+
         ESP_LOGI("CLOCK", "network_label_=%p status_label_=%p emotion_img_=%p", network_label_, status_label_, emotion_img_);
 
         // UI ausblenden
@@ -255,6 +257,9 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
         ESP_LOGI("CLOCK", "AnalogClock started");
         
     } else {
+      {
+        DisplayLockGuard lock(this);
+        
         ESP_LOGI("CLOCK", "Stopping AnalogClock...");
         AnalogClock::Stop();
 
@@ -270,9 +275,13 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
         emotion_img_ = nullptr;
         low_battery_popup_ = nullptr;
         low_battery_label_ = nullptr;
-        
+      }   
+        // Vollständigen Screen Refresh erzwingen
+        lv_obj_t* scr = lv_screen_active();
+        lv_obj_set_style_bg_color(scr, lv_color_black(), 0);
+        lv_obj_invalidate(scr);
         // Reset setup_ui_called_ Flag damit SetupUI erneut aufgerufen werden kann
-        setup_ui_called_ = false;
+        //setup_ui_called_ = false;
         
         // SetupUI erneut aufrufen um die WeChat-UI neu aufzubauen
         // Dies wird alle Pointer neu initialisieren
