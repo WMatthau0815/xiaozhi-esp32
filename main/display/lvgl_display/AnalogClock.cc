@@ -1,5 +1,5 @@
 // main/display/lvgl_display/analog_clock.cc
-#include "analog_clock.h"
+#include "AnalogClock.h"
 #include <cmath>
 #include <ctime>
 #include "esp_log.h"
