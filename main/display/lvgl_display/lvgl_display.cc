@@ -236,7 +236,15 @@ void LvglDisplay::SetPreviewImage(std::unique_ptr<LvglImage> image) {
 
 void LvglDisplay::SetPowerSaveMode(bool on) {
     ESP_LOGI("CLOCK", "SetPowerSaveMode called, on=%d", on);
- 
+     // Nur beenden wenn wirklich im Sleep Mode
+    auto display = Board::GetInstance().GetDisplay();
+    if (display->IsPowerSaveMode()) {  // ← nur wenn aktiv
+        display->SetPowerSaveMode(false);
+    }
+
+    if (!protocol_) {
+        return;
+    }
     power_save_on_ = on;
     
     if (on) {
