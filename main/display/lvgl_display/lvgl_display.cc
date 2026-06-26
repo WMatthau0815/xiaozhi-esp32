@@ -238,7 +238,6 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
     ESP_LOGI("CLOCK", "SetPowerSaveMode called, on=%d", on);
  
     power_save_on_ = on;
-    DisplayLockGuard lock(this);  // ← das fehlte
     
     if (on) {
         DisplayLockGuard lock(this);
