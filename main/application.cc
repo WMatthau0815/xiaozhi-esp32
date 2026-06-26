@@ -778,6 +778,9 @@ void Application::HandleStopListeningEvent() {
 }
 
 void Application::HandleWakeWordDetectedEvent() {
+        // Sleep Mode beenden wenn Wake Word erkannt
+    Board::GetInstance().GetDisplay()->SetPowerSaveMode(false);  // ← hinzufügen
+
     if (!protocol_) {
         return;
     }
