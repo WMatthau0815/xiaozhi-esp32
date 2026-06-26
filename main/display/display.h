@@ -29,7 +29,7 @@ class Display {
 public:
     Display();
     virtual ~Display();
-
+    virtual bool IsPowerSaveMode() const { return false; }
     virtual void SetStatus(const char* status);
     virtual void ShowNotification(const char* notification, int duration_ms = 3000);
     virtual void ShowNotification(const std::string &notification, int duration_ms = 3000);
