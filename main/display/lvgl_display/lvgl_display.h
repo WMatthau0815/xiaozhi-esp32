@@ -20,6 +20,7 @@ private:
 public:
     LvglDisplay();
     virtual ~LvglDisplay();
+    bool IsPowerSaveMode() const { return power_save_on_; }
 
     virtual void SetStatus(const char* status);
     virtual void ShowNotification(const char* notification, int duration_ms = 3000);
