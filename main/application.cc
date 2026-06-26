@@ -778,6 +778,7 @@ void Application::HandleStopListeningEvent() {
 }
 
 void Application::HandleWakeWordDetectedEvent() {
+    ESP_LOGI(TAG, "Wake word detected, calling SetPowerSaveMode(false)");
         // Sleep Mode beenden wenn Wake Word erkannt
     Board::GetInstance().GetDisplay()->SetPowerSaveMode(false);  // ← hinzufügen
 
