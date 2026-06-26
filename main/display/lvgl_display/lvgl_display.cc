@@ -280,7 +280,7 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
         lv_obj_set_style_bg_color(scr, lv_color_black(), 0);
         lv_obj_invalidate(scr);
         // Reset setup_ui_called_ Flag damit SetupUI erneut aufgerufen werden kann
-        //setup_ui_called_ = false;
+        setup_ui_called_ = false;
         
         // SetupUI erneut aufrufen um die WeChat-UI neu aufzubauen
         // Dies wird alle Pointer neu initialisieren
