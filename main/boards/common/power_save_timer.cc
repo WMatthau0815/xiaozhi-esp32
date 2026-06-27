@@ -125,8 +125,8 @@ void PowerSaveTimer::WakeUp() {
             }
         }
 
- //       if (on_exit_sleep_mode_) {
+        if (on_exit_sleep_mode_) {
             on_exit_sleep_mode_();
- //       }
+        }
     }
 }
