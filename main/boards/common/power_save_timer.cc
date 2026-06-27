@@ -58,14 +58,19 @@ void PowerSaveTimer::OnExitSleepMode(std::function<void()> callback) {
 void PowerSaveTimer::OnShutdownRequest(std::function<void()> callback) {
     on_shutdown_request_ = callback;
 }
-
+//changed by WZ, 27Jun26
 void PowerSaveTimer::PowerSaveCheck() {
     auto& app = Application::GetInstance();
-    if (!in_sleep_mode_ && !app.CanEnterSleepMode()) {
+//    if (!in_sleep_mode_ && !app.CanEnterSleepMode()) {
+//        ticks_ = 0;
+//        return;
+//    }
+if (!in_sleep_mode_ && !app.CanEnterSleepMode()) {
+    if (app.GetDeviceState() != kDeviceStateIdle) {
         ticks_ = 0;
-        return;
     }
-
+    return;
+}
     ticks_++;
     if (seconds_to_sleep_ != -1 && ticks_ >= seconds_to_sleep_) {
         if (!in_sleep_mode_) {
@@ -125,8 +130,8 @@ void PowerSaveTimer::WakeUp() {
             }
         }
 
-//        if (on_exit_sleep_mode_) {
+        if (on_exit_sleep_mode_) {
             on_exit_sleep_mode_();
-//        }
+        }
     }
 }
