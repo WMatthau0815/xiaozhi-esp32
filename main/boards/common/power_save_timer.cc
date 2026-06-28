@@ -1,6 +1,7 @@
 #include "power_save_timer.h"
 #include "application.h"
 #include "settings.h"
+#include "display.h"
 
 #include <esp_log.h>
 
