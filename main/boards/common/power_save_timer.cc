@@ -58,13 +58,14 @@ void PowerSaveTimer::OnExitSleepMode(std::function<void()> callback) {
 void PowerSaveTimer::OnShutdownRequest(std::function<void()> callback) {
     on_shutdown_request_ = callback;
 }
-//changed by WZ, 27Jun26
+
 void PowerSaveTimer::PowerSaveCheck() {
     auto& app = Application::GetInstance();
     if (!in_sleep_mode_ && !app.CanEnterSleepMode()) {
         ticks_ = 0;
         return;
     }
+
     ticks_++;
     if (seconds_to_sleep_ != -1 && ticks_ >= seconds_to_sleep_) {
         if (!in_sleep_mode_) {
@@ -73,7 +74,17 @@ void PowerSaveTimer::PowerSaveCheck() {
             if (on_enter_sleep_mode_) {
                 on_enter_sleep_mode_();
             }
+// 🔥 WZ, 28JUN26, HARD SAFETY RESET (NEU HINZUFÜGEN)
+auto& app = Application::GetInstance();
+auto display = Board::GetInstance().GetDisplay();
 
+app.Schedule([display]() {
+    display->SetPowerSaveMode(true);
+    display->ClearChatMessages();
+    display->SetChatMessage("system", "");
+    display->SetEmotion("neutral");
+    display->SetStatus("STANDBY");
+});
             if (cpu_max_freq_ != -1) {
                 // Disable wake word detection
                 auto& audio_service = app.GetAudioService();
