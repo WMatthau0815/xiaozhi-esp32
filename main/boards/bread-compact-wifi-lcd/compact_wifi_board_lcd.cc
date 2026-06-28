@@ -130,31 +130,7 @@ private:
         panel_io_ = panel_io;
         lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_STATE_DEFAULT);
     }
-/*
-void SetPowerSaveLevel(PowerSaveLevel level) override {
-    if (display_ == nullptr || panel_ == nullptr) {
-        return;
-    }
-    if (level == PowerSaveLevel::LOW_POWER) {
-        // UI Farben setzen (optional)
-        lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_STATE_DEFAULT);
-        lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0xFFFFFF), LV_STATE_DEFAULT);
 
-        // Panel wirklich aus
-        esp_lcd_panel_disp_on_off(panel_, false);
-        return;
-    }
-    // PERFORMANCE
-    esp_lcd_panel_disp_on_off(panel_, true);
-
-    // UI Farben setzen
-    lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0xFFFFFF), LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0x000000), LV_STATE_DEFAULT);
-
-    // LVGL sofort aktualisieren
-    lv_refr_now(NULL);
-}
-*/
 void InitializePowerSaveTimer() {
     power_save_timer_ = new PowerSaveTimer(-1, 60, -1);
     power_save_timer_->OnEnterSleepMode([this]() {
@@ -171,7 +147,6 @@ void InitializePowerSaveTimer() {
     });
     power_save_timer_->SetEnabled(true);
 }
-
 
 void InitializeButtons() {
         boot_button_.OnClick([this]() {
@@ -240,14 +215,6 @@ virtual Led* GetLed() override {
             return &backlight;
         }
         return nullptr;
-    }
-    //changed by WZ, 28JUN26 - WakeUp call 
-    virtual void SetPowerSaveLevel(PowerSaveLevel level) override {
-        if (level != PowerSaveLevel::LOW_POWER) {
-            if (power_save_timer_ && power_save_timer_->IsInSleepMode()) {
-                power_save_timer_->WakeUp();
-            }
-        }
     }
 };
 
