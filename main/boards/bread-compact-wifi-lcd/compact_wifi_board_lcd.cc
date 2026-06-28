@@ -135,6 +135,11 @@ void InitializePowerSaveTimer() {
     power_save_timer_ = new PowerSaveTimer(-1, 60, -1);
     power_save_timer_->OnEnterSleepMode([this]() {
         GetDisplay()->SetPowerSaveMode(true);
+        GetDisplay()->ClearChatMessages();
+        GetDisplay()->SetChatMessage("system", "");
+        GetDisplay()->SetEmotion("neutral");
+        GetDisplay()->SetStatus("STANDBY");
+        GetDisplay()->UpdateStatusBar(true);
         if (auto* backlight = GetBacklight()) {
             backlight->SetBrightness(1);
         }
