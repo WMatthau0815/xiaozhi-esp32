@@ -244,7 +244,7 @@ virtual Led* GetLed() override {
     //changed by WZ, 28JUN26 - WakeUp call 
     virtual void SetPowerSaveLevel(PowerSaveLevel level) override {
         if (level != PowerSaveLevel::LOW_POWER) {
-            if (power_save_timer_) {
+            if (power_save_timer_ && power_save_timer_->IsInSleepMode()) {
                 power_save_timer_->WakeUp();
             }
         }
