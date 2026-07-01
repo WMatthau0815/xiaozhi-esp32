@@ -136,18 +136,20 @@ void InitializePowerSaveTimer() {
     power_save_timer_->OnEnterSleepMode([this]() {
         auto& app = Application::GetInstance();
         app.Schedule([this]() {
-        GetDisplay()->SetPowerSaveMode(true);
-        if (auto* backlight = GetBacklight()) {
-            backlight->SetBrightness(1);
-        }
+           GetDisplay()->SetPowerSaveMode(true);
+           if (auto* backlight = GetBacklight()) {
+              backlight->SetBrightness(1);
+           }
+        });
     });
     power_save_timer_->OnExitSleepMode([this]() {
         auto& app = Application::GetInstance();
         app.Schedule([this]() {
-        GetDisplay()->SetPowerSaveMode(false);
-        if (auto* backlight = GetBacklight()) {
-            backlight->RestoreBrightness();
-        }
+           GetDisplay()->SetPowerSaveMode(false);
+           if (auto* backlight = GetBacklight()) {
+              backlight->RestoreBrightness();
+           }
+        });    
     });
     power_save_timer_->SetEnabled(true);
 }
