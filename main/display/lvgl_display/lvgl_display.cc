@@ -40,10 +40,6 @@ LvglDisplay::LvglDisplay() {
     } else {
         ESP_ERROR_CHECK(ret);
     }
-    if (move_timer_) {
-      lv_timer_del(move_timer_);
-      move_timer_ = nullptr;
-    }
 }
 
 LvglDisplay::~LvglDisplay() {
@@ -72,10 +68,6 @@ LvglDisplay::~LvglDisplay() {
     }
     if (pm_lock_ != nullptr) {
         esp_pm_lock_delete(pm_lock_);
-    }
-    if (move_timer_) {
-      lv_timer_del(move_timer_);
-      move_timer_ = nullptr;
     }
 }
 
