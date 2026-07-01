@@ -488,8 +488,6 @@ void LcdDisplay::SetupUI() {
 
     emoji_image_ = lv_img_create(screen);
     lv_obj_align(emoji_image_, LV_ALIGN_TOP_MID, 0, text_font->line_height + lvgl_theme->spacing(8));
-    // Register the emoji image for the screensaver movement
-    SetScreensaverObject(emoji_image_);
 
     // Display AI logo while booting
     emoji_label_ = lv_label_create(screen);
