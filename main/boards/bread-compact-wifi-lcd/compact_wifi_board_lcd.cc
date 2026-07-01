@@ -134,17 +134,16 @@ private:
 void InitializePowerSaveTimer() {
     power_save_timer_ = new PowerSaveTimer(-1, 60, -1);
     power_save_timer_->OnEnterSleepMode([this]() {
+        auto& app = Application::GetInstance();
+        app.Schedule([this]() {
         GetDisplay()->SetPowerSaveMode(true);
-//        GetDisplay()->ClearChatMessages();
-//        GetDisplay()->SetChatMessage("system", "");
-//        GetDisplay()->SetEmotion("neutral");
-//        GetDisplay()->SetStatus("STANDBY");
-//        GetDisplay()->UpdateStatusBar(true);
         if (auto* backlight = GetBacklight()) {
             backlight->SetBrightness(1);
         }
     });
     power_save_timer_->OnExitSleepMode([this]() {
+        auto& app = Application::GetInstance();
+        app.Schedule([this]() {
         GetDisplay()->SetPowerSaveMode(false);
         if (auto* backlight = GetBacklight()) {
             backlight->RestoreBrightness();
