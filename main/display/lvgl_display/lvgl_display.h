@@ -13,14 +13,10 @@
 #include <chrono>
 
 class LvglDisplay : public Display {
-private:
-    lv_timer_t* move_timer_ = nullptr;
-    lv_obj_t* emotion_img_ = nullptr;
 
 public:
     LvglDisplay();
     virtual ~LvglDisplay();
-    bool IsPowerSaveMode() const { return power_save_on_; }
 
     virtual void SetStatus(const char* status);
     virtual void ShowNotification(const char* notification, int duration_ms = 3000);
@@ -29,8 +25,6 @@ public:
     virtual void UpdateStatusBar(bool update_all = false);
     virtual void SetPowerSaveMode(bool on);
     virtual bool SnapshotToJpeg(std::string& jpeg_data, int quality = 80);
-    // Register the LVGL object that the screensaver should move
-    void SetScreensaverObject(lv_obj_t* obj) { emotion_img_ = obj; }
 
 protected:
     bool power_save_on_ = false;
