@@ -781,9 +781,9 @@ void Application::HandleWakeWordDetectedEvent() {
     ESP_LOGI(TAG, "Wake word detected, calling SetPowerSaveMode(false)");
         // Sleep Mode beenden wenn Wake Word erkannt
     auto display = Board::GetInstance().GetDisplay();
-    if (display->IsPowerSaveMode()) {
+//    if (display->IsPowerSaveMode()) {
         display->SetPowerSaveMode(false);
-    }
+//    }
   
     auto state = GetDeviceState();
     auto wake_word = audio_service_.GetLastWakeWord();
