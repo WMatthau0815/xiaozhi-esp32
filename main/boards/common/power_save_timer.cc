@@ -75,17 +75,6 @@ void PowerSaveTimer::PowerSaveCheck() {
             if (on_enter_sleep_mode_) {
                 on_enter_sleep_mode_();
             }
-// 🔥 WZ, 28JUN26, HARD SAFETY RESET (NEU HINZUFÜGEN)
-auto& app = Application::GetInstance();
-auto display = Board::GetInstance().GetDisplay();
-
-app.Schedule([display]() {
-    display->SetPowerSaveMode(true);
-    display->ClearChatMessages();
-    display->SetChatMessage("system", "");
-    display->SetEmotion("neutral");
-    display->SetStatus("STANDBY");
-});
             if (cpu_max_freq_ != -1) {
                 // Disable wake word detection
                 auto& audio_service = app.GetAudioService();
