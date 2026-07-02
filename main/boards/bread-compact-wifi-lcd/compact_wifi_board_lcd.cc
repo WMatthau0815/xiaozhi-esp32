@@ -17,6 +17,7 @@
 #include <esp_lcd_panel_io.h>
 #include <esp_lcd_panel_ops.h>
 #include <driver/spi_common.h>
+#include "display/lvgl_display/AnalogClock.h"
 
 #if defined(LCD_TYPE_ILI9341_SERIAL)
 #include "esp_lcd_ili9341.h"
@@ -130,7 +131,7 @@ private:
         panel_io_ = panel_io;
         lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_STATE_DEFAULT);
     }
-
+/* Wz, 2JUL26
 void InitializePowerSaveTimer() {
     power_save_timer_ = new PowerSaveTimer(-1, 60, -1);
     power_save_timer_->OnEnterSleepMode([this]() {
@@ -151,6 +152,30 @@ void InitializePowerSaveTimer() {
            }
         });    
     });
+    power_save_timer_->SetEnabled(true);
+}
+*/
+void InitializePowerSaveTimer() {
+    power_save_timer_ = new PowerSaveTimer(-1, 60, -1);
+
+    power_save_timer_->OnEnterSleepMode([this]() {
+        auto& app = Application::GetInstance();
+        app.Schedule([this]() {
+            GetDisplay()->SetPowerSaveMode(true);
+            AnalogClock::Start(lv_scr_act());
+            if (auto* bl = GetBacklight()) bl->SetBrightness(1);
+        });
+    });
+
+    power_save_timer_->OnExitSleepMode([this]() {
+        auto& app = Application::GetInstance();
+        app.Schedule([this]() {
+            AnalogClock::Stop();
+            GetDisplay()->SetPowerSaveMode(false);
+            if (auto* bl = GetBacklight()) bl->RestoreBrightness();
+        });
+    });
+
     power_save_timer_->SetEnabled(true);
 }
 
