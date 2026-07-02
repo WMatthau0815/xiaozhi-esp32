@@ -13,7 +13,8 @@
 #include <chrono>
 
 class LvglDisplay : public Display {
-
+private:
+    esp_lcd_panel_handle_t panel_ = nullptr;
 public:
     LvglDisplay();
     virtual ~LvglDisplay();
