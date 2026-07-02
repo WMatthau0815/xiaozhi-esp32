@@ -162,6 +162,7 @@ void InitializePowerSaveTimer() {
         auto& app = Application::GetInstance();
         app.Schedule([this]() {
             GetDisplay()->SetPowerSaveMode(true);
+            GetDisplay()->SetEmotion("sleepy");
 //            AnalogClock::Start(lv_scr_act());
             if (auto* bl = GetBacklight()) bl->SetBrightness(1);
         });
