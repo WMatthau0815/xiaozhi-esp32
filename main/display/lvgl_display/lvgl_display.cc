@@ -39,6 +39,10 @@ LvglDisplay::LvglDisplay() {
     } else {
         ESP_ERROR_CHECK(ret);
     }
+    if (move_timer_) {
+      lv_timer_del(move_timer_);
+      move_timer_ = nullptr;
+    }
 }
 
 LvglDisplay::~LvglDisplay() {
@@ -67,6 +71,10 @@ LvglDisplay::~LvglDisplay() {
     }
     if (pm_lock_ != nullptr) {
         esp_pm_lock_delete(pm_lock_);
+    }
+    if (move_timer_) {
+      lv_timer_del(move_timer_);
+      move_timer_ = nullptr;
     }
 }
 
@@ -224,34 +232,43 @@ void LvglDisplay::UpdateStatusBar(bool update_all) {
 
 void LvglDisplay::SetPreviewImage(std::unique_ptr<LvglImage> image) {
 }
+/*
+void LvglDisplay::SetPowerSaveMode(bool on) {
+    if (on) {
+        SetChatMessage("system", "");
+        SetEmotion("sleepy");
+    } else {
+        SetChatMessage("system", "");
+        SetEmotion("neutral");
+    }
+}
+*/
+
 void LvglDisplay::SetPowerSaveMode(bool on) {
     ESP_LOGI("SCREENSAVER", "SetPowerSaveMode called with on=%d", on);
 
-    power_save_on_ = on;  // Flag für UpdateStatusBar
+    power_save_on_ = on;  // Flag setzen
 
     if (on) {
-        // Ruhezustand – Bildschirmschoner aktiv
+        // Ruhezustand
         SetChatMessage("system", "");
         SetEmotion("sleepy");
 
-        // Header (Uhrzeit, WLAN, Batterie, Stummschaltung) ausblenden
+        // Header komplett ausblenden
         if (network_label_) lv_obj_add_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
         if (status_label_) lv_obj_add_flag(status_label_, LV_OBJ_FLAG_HIDDEN);
         if (battery_label_) lv_obj_add_flag(battery_label_, LV_OBJ_FLAG_HIDDEN);
         if (mute_label_) lv_obj_add_flag(mute_label_, LV_OBJ_FLAG_HIDDEN);
 
-        // Timer starten (falls nicht bereits aktiv)
+        // Timer starten (Smiley bewegen)
         if (!move_timer_) {
             move_timer_ = lv_timer_create([](lv_timer_t* timer) {
                 auto* disp = static_cast<LvglDisplay*>(lv_timer_get_user_data(timer));
                 if (disp && disp->emotion_img_) {
-                    // Smiley als direktes Kind des Bildschirms setzen (absolute Positionierung)
+                    ESP_LOGI("SCREENSAVER", "Parent is screen? %d", lv_obj_get_parent(disp->emotion_img_) == lv_scr_act());
+                    ESP_LOGI("SCREENSAVER", "Icon centered at (%d, %d)", lv_obj_get_x(disp->emotion_img_), lv_obj_get_y(disp->emotion_img_));
                     lv_obj_set_parent(disp->emotion_img_, lv_scr_act());
-                    // Alle automatischen Ausrichtungen und Ränder entfernen
-                    lv_obj_set_style_align(disp->emotion_img_, LV_ALIGN_DEFAULT, 0);
-                    lv_obj_set_style_margin_all(disp->emotion_img_, 0, 0);
 
-                    // Tatsächliche Display-Auflösung vom Treiber holen
                     int w = lv_disp_get_hor_res(lv_disp_get_default());
                     int h = lv_disp_get_ver_res(lv_disp_get_default());
 
@@ -269,13 +286,15 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
                     int x = margin + esp_random() % (max_x - margin + 1);
                     int y = margin + esp_random() % (max_y - margin + 1);
 
-                    // Smiley an neue Position setzen
+                    ESP_LOGI("SCREENSAVER", "w=%d, h=%d, x=%d, y=%d", w, h, x, y);
+
                     lv_obj_set_pos(disp->emotion_img_, x, y);
                 }
-            }, 2000, this);  // Alle 2 Sekunden neue Position
+            }, 2000, this);
         }
     } else {
-        // Normalzustand – Bildschirmschoner beenden
+        // Normalzustand (on == false)
+        // Timer stoppen
         if (move_timer_) {
             lv_timer_del(move_timer_);
             move_timer_ = nullptr;
@@ -290,12 +309,13 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
         if (battery_label_) lv_obj_clear_flag(battery_label_, LV_OBJ_FLAG_HIDDEN);
         if (mute_label_) lv_obj_clear_flag(mute_label_, LV_OBJ_FLAG_HIDDEN);
 
-        // Smiley wieder zentrieren
+        // Smiley zentrieren
         if (emotion_img_) {
             lv_obj_center(emotion_img_);
         }
     }
 }
+
 bool LvglDisplay::SnapshotToJpeg(std::string& jpeg_data, int quality) {
 #if CONFIG_LV_USE_SNAPSHOT
     DisplayLockGuard lock(this);
