@@ -254,7 +254,11 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
         // Ruhezustand
         SetChatMessage("system", "");
         SetEmotion("sleepy");
-
+        if (!screensaver_obj_) {
+            screensaver_obj_ = lv_obj_create(lv_scr_act());
+            lv_obj_set_size(screensaver_obj_, 50, 50);
+            lv_obj_set_style_bg_color(screensaver_obj_, lv_color_hex(0xFF0000), 0);
+        }
         // Header komplett ausblenden
         if (network_label_) lv_obj_add_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
         if (status_label_) lv_obj_add_flag(status_label_, LV_OBJ_FLAG_HIDDEN);
