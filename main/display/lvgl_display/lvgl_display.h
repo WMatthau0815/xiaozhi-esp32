@@ -27,6 +27,7 @@ public:
     virtual void UpdateStatusBar(bool update_all = false);
     virtual void SetPowerSaveMode(bool on);
     virtual bool SnapshotToJpeg(std::string& jpeg_data, int quality = 80);
+    void SetPanelHandle(esp_lcd_panel_handle_t panel) { panel_ = panel; }
 
 protected:
     bool power_save_on_ = false;
