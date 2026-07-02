@@ -12,7 +12,6 @@
 #include "settings.h"
 #include "assets/lang_config.h"
 #include "jpg/image_to_jpeg.h"
-#include "AnalogClock.h"
 //#include "boards/bread-compact-wifi-lcd/config.h"
 
 #define TAG "Display"
@@ -225,7 +224,7 @@ void LvglDisplay::UpdateStatusBar(bool update_all) {
 
 void LvglDisplay::SetPreviewImage(std::unique_ptr<LvglImage> image) {
 }
-
+/* changed WZ, 2Jul26
 void LvglDisplay::SetPowerSaveMode(bool on) {
     ESP_LOGI("CLOCK", "SetPowerSaveMode called, on=%d", on);
 
@@ -262,6 +261,26 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
         SetEmotion("neutral");
         SetChatMessage("system", "");
         SetStatus("");
+    }
+}
+*/
+void LvglDisplay::SetPowerSaveMode(bool on) {
+    if (power_save_on_ == on) return;
+    ESP_LOGI(TAG, "SetPowerSaveMode: %d", on);
+    power_save_on_ = on;
+    DisplayLockGuard lock(this);
+    if (on) {
+        if (network_label_)      lv_obj_add_flag(network_label_,      LV_OBJ_FLAG_HIDDEN);
+        if (status_label_)       lv_obj_add_flag(status_label_,       LV_OBJ_FLAG_HIDDEN);
+        if (battery_label_)      lv_obj_add_flag(battery_label_,      LV_OBJ_FLAG_HIDDEN);
+        if (mute_label_)         lv_obj_add_flag(mute_label_,         LV_OBJ_FLAG_HIDDEN);
+        if (notification_label_) lv_obj_add_flag(notification_label_, LV_OBJ_FLAG_HIDDEN);
+    } else {
+        if (network_label_)      lv_obj_remove_flag(network_label_,      LV_OBJ_FLAG_HIDDEN);
+        if (status_label_)       lv_obj_remove_flag(status_label_,       LV_OBJ_FLAG_HIDDEN);
+        if (battery_label_)      lv_obj_remove_flag(battery_label_,      LV_OBJ_FLAG_HIDDEN);
+        if (mute_label_)         lv_obj_remove_flag(mute_label_,         LV_OBJ_FLAG_HIDDEN);
+        if (notification_label_) lv_obj_remove_flag(notification_label_, LV_OBJ_FLAG_HIDDEN);
     }
 }
 
