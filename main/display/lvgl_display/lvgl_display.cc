@@ -14,7 +14,7 @@
 #include "jpg/image_to_jpeg.h"
 //#include "boards/bread-compact-wifi-lcd/config.h"
 
-#define TAG "Display"
+#define TAG "Display" 
 
 LvglDisplay::LvglDisplay() {
     // Notification timer
