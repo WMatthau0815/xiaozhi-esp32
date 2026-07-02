@@ -5,6 +5,7 @@
 #include "lvgl_image.h"
 
 #include <lvgl.h>
+#include <esp_lcd_panel.h>
 #include <esp_timer.h>
 #include <esp_log.h>
 #include <esp_pm.h>
