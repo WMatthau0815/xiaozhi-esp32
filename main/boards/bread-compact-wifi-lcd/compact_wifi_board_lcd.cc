@@ -162,7 +162,7 @@ void InitializePowerSaveTimer() {
         auto& app = Application::GetInstance();
         app.Schedule([this]() {
             GetDisplay()->SetPowerSaveMode(true);
-            AnalogClock::Start(lv_scr_act());
+//            AnalogClock::Start(lv_scr_act());
             if (auto* bl = GetBacklight()) bl->SetBrightness(1);
         });
     });
@@ -170,7 +170,7 @@ void InitializePowerSaveTimer() {
     power_save_timer_->OnExitSleepMode([this]() {
         auto& app = Application::GetInstance();
         app.Schedule([this]() {
-            AnalogClock::Stop();
+//            AnalogClock::Stop();
             GetDisplay()->SetPowerSaveMode(false);
             if (auto* bl = GetBacklight()) bl->RestoreBrightness();
         });
