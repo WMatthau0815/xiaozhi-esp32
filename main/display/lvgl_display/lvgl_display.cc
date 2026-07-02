@@ -283,7 +283,10 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
 
         SetChatMessage("system", "");
         SetEmotion("neutral");
-
+        // Panel wieder einschalten
+        if (panel_) {
+            esp_lcd_panel_disp_on_off(panel_, true);
+        }
         // Header wieder einblenden
         if (network_label_) lv_obj_clear_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
         if (status_label_) lv_obj_clear_flag(status_label_, LV_OBJ_FLAG_HIDDEN);
