@@ -250,6 +250,7 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
     power_save_on_ = on;  // Flag setzen
 
     if (on) {
+        ESP_LOGI("SCREENSAVER", "Ruhezustand....");
         // Ruhezustand
         SetChatMessage("system", "");
         SetEmotion("sleepy");
@@ -262,6 +263,7 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
 
         // Timer starten (Smiley bewegen)
         if (!move_timer_) {
+            ESP_LOGI("SCREENSAVER", "Timer startet....");
             move_timer_ = lv_timer_create([](lv_timer_t* timer) {
                 auto* disp = static_cast<LvglDisplay*>(lv_timer_get_user_data(timer));
                 if (disp && disp->emotion_img_) {
