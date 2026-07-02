@@ -224,66 +224,78 @@ void LvglDisplay::UpdateStatusBar(bool update_all) {
 
 void LvglDisplay::SetPreviewImage(std::unique_ptr<LvglImage> image) {
 }
-/* changed WZ, 2Jul26
 void LvglDisplay::SetPowerSaveMode(bool on) {
-    ESP_LOGI("CLOCK", "SetPowerSaveMode called, on=%d", on);
+    ESP_LOGI("SCREENSAVER", "SetPowerSaveMode called with on=%d", on);
 
-    power_save_on_ = on;
+    power_save_on_ = on;  // Flag für UpdateStatusBar
 
     if (on) {
-        DisplayLockGuard lock(this);
-
-        // UI-Elemente ausblenden
-        if (network_label_)      lv_obj_add_flag(network_label_,      LV_OBJ_FLAG_HIDDEN);
-        if (status_label_)       lv_obj_add_flag(status_label_,       LV_OBJ_FLAG_HIDDEN);
-        if (battery_label_)      lv_obj_add_flag(battery_label_,      LV_OBJ_FLAG_HIDDEN);
-        if (mute_label_)         lv_obj_add_flag(mute_label_,         LV_OBJ_FLAG_HIDDEN);
-        if (notification_label_) lv_obj_add_flag(notification_label_, LV_OBJ_FLAG_HIDDEN);
-
-        ESP_LOGI("CLOCK", "Starting AnalogClock...");
-        AnalogClock::Start(lv_scr_act());
-        ESP_LOGI("CLOCK", "AnalogClock started");
-
-    } else {
-        DisplayLockGuard lock(this);
-
-        ESP_LOGI("CLOCK", "Stopping AnalogClock...");
-        AnalogClock::Stop();
-
-        // UI-Elemente wieder einblenden
-        if (network_label_)      lv_obj_remove_flag(network_label_,      LV_OBJ_FLAG_HIDDEN);
-        if (status_label_)       lv_obj_remove_flag(status_label_,       LV_OBJ_FLAG_HIDDEN);
-        if (battery_label_)      lv_obj_remove_flag(battery_label_,      LV_OBJ_FLAG_HIDDEN);
-        if (mute_label_)         lv_obj_remove_flag(mute_label_,         LV_OBJ_FLAG_HIDDEN);
-        if (notification_label_) lv_obj_remove_flag(notification_label_, LV_OBJ_FLAG_HIDDEN);
-
-        // Emotion und Status zurücksetzen (emoji_image_ liegt in LcdDisplay)
-        SetEmotion("neutral");
+        // Ruhezustand – Bildschirmschoner aktiv
         SetChatMessage("system", "");
-        SetStatus("");
-    }
-}
-*/
-void LvglDisplay::SetPowerSaveMode(bool on) {
-    if (power_save_on_ == on) return;
-    ESP_LOGI(TAG, "SetPowerSaveMode: %d", on);
-    power_save_on_ = on;
-    DisplayLockGuard lock(this);
-    if (on) {
-        if (network_label_)      lv_obj_add_flag(network_label_,      LV_OBJ_FLAG_HIDDEN);
-        if (status_label_)       lv_obj_add_flag(status_label_,       LV_OBJ_FLAG_HIDDEN);
-        if (battery_label_)      lv_obj_add_flag(battery_label_,      LV_OBJ_FLAG_HIDDEN);
-        if (mute_label_)         lv_obj_add_flag(mute_label_,         LV_OBJ_FLAG_HIDDEN);
-        if (notification_label_) lv_obj_add_flag(notification_label_, LV_OBJ_FLAG_HIDDEN);
-    } else {
-        if (network_label_)      lv_obj_remove_flag(network_label_,      LV_OBJ_FLAG_HIDDEN);
-        if (status_label_)       lv_obj_remove_flag(status_label_,       LV_OBJ_FLAG_HIDDEN);
-        if (battery_label_)      lv_obj_remove_flag(battery_label_,      LV_OBJ_FLAG_HIDDEN);
-        if (mute_label_)         lv_obj_remove_flag(mute_label_,         LV_OBJ_FLAG_HIDDEN);
-        if (notification_label_) lv_obj_remove_flag(notification_label_, LV_OBJ_FLAG_HIDDEN);
-    }
-}
+        SetEmotion("sleepy");
 
+        // Header (Uhrzeit, WLAN, Batterie, Stummschaltung) ausblenden
+        if (network_label_) lv_obj_add_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
+        if (status_label_) lv_obj_add_flag(status_label_, LV_OBJ_FLAG_HIDDEN);
+        if (battery_label_) lv_obj_add_flag(battery_label_, LV_OBJ_FLAG_HIDDEN);
+        if (mute_label_) lv_obj_add_flag(mute_label_, LV_OBJ_FLAG_HIDDEN);
+
+        // Timer starten (falls nicht bereits aktiv)
+        if (!move_timer_) {
+            move_timer_ = lv_timer_create([](lv_timer_t* timer) {
+                auto* disp = static_cast<LvglDisplay*>(lv_timer_get_user_data(timer));
+                if (disp && disp->emotion_img_) {
+                    // Smiley als direktes Kind des Bildschirms setzen (absolute Positionierung)
+                    lv_obj_set_parent(disp->emotion_img_, lv_scr_act());
+                    // Alle automatischen Ausrichtungen und Ränder entfernen
+                    lv_obj_set_style_align(disp->emotion_img_, LV_ALIGN_DEFAULT, 0);
+                    lv_obj_set_style_margin_all(disp->emotion_img_, 0, 0);
+
+                    // Tatsächliche Display-Auflösung vom Treiber holen
+                    int w = lv_disp_get_hor_res(lv_disp_get_default());
+                    int h = lv_disp_get_ver_res(lv_disp_get_default());
+
+                    int icon_w = lv_obj_get_width(disp->emotion_img_);
+                    int icon_h = lv_obj_get_height(disp->emotion_img_);
+                    if (icon_w <= 0) icon_w = 50;
+                    if (icon_h <= 0) icon_h = 50;
+
+                    int margin = 20;
+                    int max_x = w - icon_w - margin;
+                    int max_y = h - icon_h - margin;
+                    if (max_x < margin) max_x = margin;
+                    if (max_y < margin) max_y = margin;
+
+                    int x = margin + esp_random() % (max_x - margin + 1);
+                    int y = margin + esp_random() % (max_y - margin + 1);
+
+                    // Smiley an neue Position setzen
+                    lv_obj_set_pos(disp->emotion_img_, x, y);
+                }
+            }, 2000, this);  // Alle 2 Sekunden neue Position
+        }
+    } else {
+        // Normalzustand – Bildschirmschoner beenden
+        if (move_timer_) {
+            lv_timer_del(move_timer_);
+            move_timer_ = nullptr;
+        }
+
+        SetChatMessage("system", "");
+        SetEmotion("neutral");
+
+        // Header wieder einblenden
+        if (network_label_) lv_obj_clear_flag(network_label_, LV_OBJ_FLAG_HIDDEN);
+        if (status_label_) lv_obj_clear_flag(status_label_, LV_OBJ_FLAG_HIDDEN);
+        if (battery_label_) lv_obj_clear_flag(battery_label_, LV_OBJ_FLAG_HIDDEN);
+        if (mute_label_) lv_obj_clear_flag(mute_label_, LV_OBJ_FLAG_HIDDEN);
+
+        // Smiley wieder zentrieren
+        if (emotion_img_) {
+            lv_obj_center(emotion_img_);
+        }
+    }
+}
 bool LvglDisplay::SnapshotToJpeg(std::string& jpeg_data, int quality) {
 #if CONFIG_LV_USE_SNAPSHOT
     DisplayLockGuard lock(this);
