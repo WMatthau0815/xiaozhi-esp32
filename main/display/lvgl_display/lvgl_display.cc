@@ -266,7 +266,10 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
             ESP_LOGI("SCREENSAVER", "Timer startet....");
             move_timer_ = lv_timer_create([](lv_timer_t* timer) {
                 auto* disp = static_cast<LvglDisplay*>(lv_timer_get_user_data(timer));
-                if (disp && disp->emotion_img_) {
+                if (disp) {
+                      ESP_LOGI("SCREENSAVER", "disp exitstiert....");
+                     if (disp->emotion_img_) {
+//                if (disp && disp->emotion_img_) {
                     ESP_LOGI("SCREENSAVER", "Parent is screen? %d", lv_obj_get_parent(disp->emotion_img_) == lv_scr_act());
                     ESP_LOGI("SCREENSAVER", "Icon centered at (%d, %d)", lv_obj_get_x(disp->emotion_img_), lv_obj_get_y(disp->emotion_img_));
                     lv_obj_set_parent(disp->emotion_img_, lv_scr_act());
@@ -291,6 +294,7 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
                     ESP_LOGI("SCREENSAVER", "w=%d, h=%d, x=%d, y=%d", w, h, x, y);
 
                     lv_obj_set_pos(disp->emotion_img_, x, y);
+                  }       
                 }
             }, 2000, this);
         }
