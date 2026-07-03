@@ -232,7 +232,7 @@ void LvglDisplay::UpdateStatusBar(bool update_all) {
 
 void LvglDisplay::SetPreviewImage(std::unique_ptr<LvglImage> image) {
 }
-/*
+// WZ 03JUL26, we let the original
 void LvglDisplay::SetPowerSaveMode(bool on) {
     if (on) {
         SetChatMessage("system", "");
@@ -242,8 +242,8 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
         SetEmotion("neutral");
     }
 }
-*/
 
+/*   WZ 03JUL26, screen saver works w/ sqaure, but ugly, does not work w/ smiley - why???
 void LvglDisplay::SetPowerSaveMode(bool on) {
     ESP_LOGI("SCREENSAVER", "SetPowerSaveMode called with on=%d", on);
 
@@ -319,7 +319,7 @@ void LvglDisplay::SetPowerSaveMode(bool on) {
         if (mute_label_) lv_obj_clear_flag(mute_label_, LV_OBJ_FLAG_HIDDEN);
     }
 }
-
+*/
 bool LvglDisplay::SnapshotToJpeg(std::string& jpeg_data, int quality) {
 #if CONFIG_LV_USE_SNAPSHOT
     DisplayLockGuard lock(this);
