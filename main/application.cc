@@ -787,7 +787,7 @@ void Application::HandleWakeWordDetectedEvent() {
 //        AnalogClock::Stop(display);
 //    });
     if (auto* t = PowerSaveTimer::GetInstance()) t->WakeUp();
-    display->SetPowerSaveMode(false);
+//    display->SetPowerSaveMode(false);
 
     auto state = GetDeviceState();
     auto wake_word = audio_service_.GetLastWakeWord();
