@@ -780,11 +780,11 @@ void Application::HandleStopListeningEvent() {
 
 void Application::HandleWakeWordDetectedEvent() {
     ESP_LOGI(TAG, "Wake word detected, calling SetPowerSaveMode(false)");
+        // Sleep Mode beenden wenn Wake Word erkannt
+    auto display = Board::GetInstance().GetDisplay();
     Schedule([display]() {                     // GEÄNDERT: display statt this fangen
         AnalogClock::Stop(display);
     });
-        // Sleep Mode beenden wenn Wake Word erkannt
-    auto display = Board::GetInstance().GetDisplay();
     display->SetPowerSaveMode(false);
 
     auto state = GetDeviceState();
