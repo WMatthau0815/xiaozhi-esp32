@@ -34,4 +34,5 @@ private:
     std::function<void()> on_enter_sleep_mode_;
     std::function<void()> on_exit_sleep_mode_;
     std::function<void()> on_shutdown_request_;
+    static PowerSaveTimer* instance_;
 };
