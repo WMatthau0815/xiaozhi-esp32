@@ -10,6 +10,7 @@
 PowerSaveTimer* PowerSaveTimer::instance_ = nullptr; 
 PowerSaveTimer::PowerSaveTimer(int cpu_max_freq, int seconds_to_sleep, int seconds_to_shutdown)
     : cpu_max_freq_(cpu_max_freq), seconds_to_sleep_(seconds_to_sleep), seconds_to_shutdown_(seconds_to_shutdown) {
+    instance_ = this;
     esp_timer_create_args_t timer_args = {
         .callback = [](void* arg) {
             auto self = static_cast<PowerSaveTimer*>(arg);
