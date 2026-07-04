@@ -17,6 +17,7 @@
 #include <arpa/inet.h>
 #include <font_awesome.h>
 #include "AnalogClock.h"
+#include "power_save_timer.h"
 
 #define TAG "Application"
 
@@ -781,10 +782,11 @@ void Application::HandleStopListeningEvent() {
 void Application::HandleWakeWordDetectedEvent() {
     ESP_LOGI(TAG, "Wake word detected, calling SetPowerSaveMode(false)");
         // Sleep Mode beenden wenn Wake Word erkannt
-    auto display = Board::GetInstance().GetDisplay();
-    Schedule([display]() {                     // GEÄNDERT: display statt this fangen
-        AnalogClock::Stop(display);
-    });
+//    auto display = Board::GetInstance().GetDisplay();
+//    Schedule([display]() {                     // GEÄNDERT: display statt this fangen
+//        AnalogClock::Stop(display);
+//    });
+    if (auto* t = PowerSaveTimer::GetInstance()) t->WakeUp();
     display->SetPowerSaveMode(false);
 
     auto state = GetDeviceState();
