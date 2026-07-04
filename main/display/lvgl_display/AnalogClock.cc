@@ -50,7 +50,8 @@ void AnalogClock::DrawFace(lv_obj_t* parent) {
                     lv_display_get_vertical_resolution(lv_display_get_default()));
     lv_obj_set_pos(clock_container_, 0, 0);
     lv_obj_set_style_bg_color(clock_container_, lv_color_hex(0x000000), 0);
-    lv_obj_set_style_bg_opa(clock_container_, LV_OPA_COVER, 0);
+//    lv_obj_set_style_bg_opa(clock_container_, LV_OPA_COVER, 0);
+    lv_obj_set_style_bg_opa(clock_container_, LV_OPA_TRANSP, 0);
     lv_obj_set_style_border_width(clock_container_, 0, 0);
     lv_obj_set_style_pad_all(clock_container_, 0, 0);
     lv_obj_clear_flag(clock_container_, LV_OBJ_FLAG_SCROLLABLE);
