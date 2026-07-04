@@ -14,6 +14,7 @@ lv_obj_t*  AnalogClock::hr_hand_        = nullptr;
 lv_obj_t*  AnalogClock::center_dot_     = nullptr;
 lv_obj_t*  AnalogClock::clock_container_ = nullptr;
 lv_timer_t* AnalogClock::clock_timer_   = nullptr;
+Display*    AnalogClock::display_       = nullptr;   // <<< DIESE ZEILE NEU EINFÜGEN
 int         AnalogClock::cx_            = 120;
 int         AnalogClock::cy_            = 120;
 
@@ -152,17 +153,14 @@ void AnalogClock::UpdateHands() {
     lv_obj_move_foreground(center_dot_);
 }
 
-// --- Timer Callback ---
-void AnalogClock::TimerCb(lv_timer_t* timer) {
-    UpdateHands();
-}
-
 // --- Public: Start ---
-void AnalogClock::Start(lv_obj_t* parent) {
+void AnalogClock::Start(lv_obj_t* parent, Display* display) {
     if (clock_container_ != nullptr) {
         ESP_LOGW(TAG, "AnalogClock already running");
         return;
     }
+    display_ = display;
+    DisplayLockGuard lock(display_);
     ESP_LOGI(TAG, "AnalogClock Start");
     DrawFace(parent);
     UpdateHands();
@@ -170,7 +168,8 @@ void AnalogClock::Start(lv_obj_t* parent) {
 }
 
 // --- Public: Stop ---
-void AnalogClock::Stop() {
+void AnalogClock::Stop(Display* display) {
+    DisplayLockGuard lock(display);
     ESP_LOGI(TAG, "AnalogClock Stop");
     if (clock_timer_) {
         lv_timer_del(clock_timer_);
@@ -180,6 +179,13 @@ void AnalogClock::Stop() {
         lv_obj_del(clock_container_);
         clock_container_ = nullptr;
     }
-    // Zeiger nullen
     sec_hand_ = sec_cw_ = min_hand_ = hr_hand_ = center_dot_ = nullptr;
+    display_ = nullptr;
+}
+
+// --- Timer Callback ---
+void AnalogClock::TimerCb(lv_timer_t* timer) {
+    if (!display_) return;
+    DisplayLockGuard lock(display_);
+    UpdateHands();
 }
