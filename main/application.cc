@@ -780,15 +780,13 @@ void Application::HandleStopListeningEvent() {
 
 void Application::HandleWakeWordDetectedEvent() {
     ESP_LOGI(TAG, "Wake word detected, calling SetPowerSaveMode(false)");
-    Schedule([this]() {
-        AnalogClock::Stop();
+    Schedule([display]() {                     // GEÄNDERT: display statt this fangen
+        AnalogClock::Stop(display);
     });
         // Sleep Mode beenden wenn Wake Word erkannt
     auto display = Board::GetInstance().GetDisplay();
-//    if (display->IsPowerSaveMode()) {
-        display->SetPowerSaveMode(false);
-//    }
-  
+    display->SetPowerSaveMode(false);
+
     auto state = GetDeviceState();
     auto wake_word = audio_service_.GetLastWakeWord();
     ESP_LOGI(TAG, "Wake word detected: %s (state: %d)", wake_word.c_str(), (int)state);
