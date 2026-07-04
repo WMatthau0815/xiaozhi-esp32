@@ -17,6 +17,7 @@ public:
     void WakeUp();
     // WZ, 28JUN26
     bool IsInSleepMode() const { return in_sleep_mode_; }
+    static PowerSaveTimer* GetInstance() { return instance_; }
 
 private:
     void PowerSaveCheck();
