@@ -16,6 +16,7 @@
 #include <driver/gpio.h>
 #include <arpa/inet.h>
 #include <font_awesome.h>
+#include "AnalogClock.h"
 
 #define TAG "Application"
 
@@ -779,6 +780,9 @@ void Application::HandleStopListeningEvent() {
 
 void Application::HandleWakeWordDetectedEvent() {
     ESP_LOGI(TAG, "Wake word detected, calling SetPowerSaveMode(false)");
+    Schedule([this]() {
+        AnalogClock::Stop();
+    });
         // Sleep Mode beenden wenn Wake Word erkannt
     auto display = Board::GetInstance().GetDisplay();
 //    if (display->IsPowerSaveMode()) {
