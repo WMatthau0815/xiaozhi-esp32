@@ -785,7 +785,7 @@ void Application::HandleWakeWordDetectedEvent() {
 //    auto display = Board::GetInstance().GetDisplay();
 //    Schedule([display]() {                     // GEÄNDERT: display statt this fangen
 //        AnalogClock::Stop(display);
-//    });
+//    }); 
     if (auto* t = PowerSaveTimer::GetInstance()) t->WakeUp();
 //    display->SetPowerSaveMode(false);
 
