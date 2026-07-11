@@ -130,7 +130,9 @@ void AnalogClock::DrawFace(lv_obj_t* parent) {
     temp_label_ = lv_label_create(clock_container_);
     lv_obj_set_style_text_color(temp_label_, lv_color_hex(0xFFFFFF), 0);
     lv_label_set_text(temp_label_, "--.-\xC2\xB0" "C");  // Platzhalter, "°C" als UTF-8
-    lv_obj_align(temp_label_, LV_ALIGN_CENTER, 0, -TEMP_LABEL_Y_OFFSET);
+    lv_obj_set_pos(temp_label_, 0, TEMP_LABEL_Y);
+    lv_obj_set_width(temp_label_, lv_display_get_horizontal_resolution(lv_display_get_default()));
+    lv_obj_set_style_text_align(temp_label_, LV_TEXT_ALIGN_CENTER, 0);
 }
 
 // --- Zeiger updaten ---
