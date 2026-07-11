@@ -18,6 +18,7 @@
 #include <esp_lcd_panel_ops.h>
 #include <driver/spi_common.h>
 #include "display/lvgl_display/AnalogClock.h"
+#include "temperature_sensor.h"
 
 #if defined(LCD_TYPE_ILI9341_SERIAL)
 #include "esp_lcd_ili9341.h"
@@ -132,30 +133,7 @@ private:
         panel_io_ = panel_io;
         lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_STATE_DEFAULT);
     }
-/* Wz, 2JUL26
-void InitializePowerSaveTimer() {
-    power_save_timer_ = new PowerSaveTimer(-1, 60, -1);
-    power_save_timer_->OnEnterSleepMode([this]() {
-        auto& app = Application::GetInstance();
-        app.Schedule([this]() {
-           GetDisplay()->SetPowerSaveMode(true);
-           if (auto* backlight = GetBacklight()) {
-              backlight->SetBrightness(1);
-           }
-        });
-    });
-    power_save_timer_->OnExitSleepMode([this]() {
-        auto& app = Application::GetInstance();
-        app.Schedule([this]() {
-           GetDisplay()->SetPowerSaveMode(false);
-           if (auto* backlight = GetBacklight()) {
-              backlight->RestoreBrightness();
-           }
-        });    
-    });
-    power_save_timer_->SetEnabled(true);
-}
-*/
+
 void InitializePowerSaveTimer() {
     power_save_timer_ = new PowerSaveTimer(-1, 60, -1);
     power_save_timer_->OnEnterSleepMode([this]() {
@@ -194,6 +172,9 @@ void InitializeButtons() {
 void InitializeTools() {
     #ifdef LAMP_GPIO
     static LampController lamp(LAMP_GPIO);
+    #endif
+    #ifdef DS18B20_GPIO
+    static TemperatureSensor room_temp(DS18B20_GPIO);
     #endif
 }
 public:
