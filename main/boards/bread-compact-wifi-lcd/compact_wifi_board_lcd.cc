@@ -71,6 +71,7 @@ private:
     esp_lcd_panel_handle_t panel_;      // Muss vorhanden sein
     esp_lcd_panel_io_handle_t panel_io_; // Optional, für manuelle Befehle
     PowerSaveTimer* power_save_timer_ = nullptr;
+    TemperatureSensor* room_temp_ = nullptr;   // NEU
 
     void InitializeSpi() {
         spi_bus_config_t buscfg = {};
@@ -141,8 +142,9 @@ void InitializePowerSaveTimer() {
         app.Schedule([this]() {
             GetDisplay()->SetPowerSaveMode(true);
             GetDisplay()->SetEmotion("sleepy");
-            AnalogClock::Start(lv_scr_act(), GetDisplay());   // GEÄNDERT
-            if (auto* bl = GetBacklight()) bl->SetBrightness(1);
+//            AnalogClock::Start(lv_scr_act(), GetDisplay());   // GEÄNDERT
+            AnalogClock::Start(lv_scr_act(), GetDisplay(), room_temp_);   // GEÄNDERT: room_temp_ ergänzt
+             if (auto* bl = GetBacklight()) bl->SetBrightness(1);
         });
     });
     power_save_timer_->OnExitSleepMode([this]() {
@@ -174,7 +176,7 @@ void InitializeTools() {
     static LampController lamp(LAMP_GPIO);
     #endif
     #ifdef DS18B20_GPIO
-    static TemperatureSensor room_temp(DS18B20_GPIO);
+    room_temp_ = new TemperatureSensor(DS18B20_GPIO);   // GEÄNDERT: new statt static-lokal
     #endif
 }
 public:
@@ -195,6 +197,7 @@ public:
     // 👇 Add this destructor
     ~CompactWifiBoardLCD() {
         delete power_save_timer_;
+        delete room_temp_;   // NEU
     }
 
 virtual Led* GetLed() override {
