@@ -63,6 +63,19 @@ void AnalogClock::DrawFace(lv_obj_t* parent) {
     cx_ = lv_display_get_horizontal_resolution(lv_display_get_default()) / 2;
     cy_ = lv_display_get_vertical_resolution(lv_display_get_default()) / 2;
 
+    // Schwarzer Abdeckring - deckt den Übergangsbereich blickdicht ab,
+    // damit im Sleep-Modus nichts vom digitalen Text durchscheint
+    lv_obj_t* ring_black = lv_arc_create(clock_container_);
+    lv_obj_set_size(ring_black, 240, 240);
+    lv_arc_set_bg_angles(ring_black, 0, 360);
+    lv_obj_set_style_arc_color(ring_black, lv_color_hex(0x000000), LV_PART_MAIN);
+    lv_obj_set_style_arc_width(ring_black, 20, LV_PART_MAIN);
+    lv_obj_set_style_arc_opa(ring_black, LV_OPA_TRANSP, LV_PART_INDICATOR);
+    lv_obj_set_style_bg_opa(ring_black, LV_OPA_TRANSP, LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(ring_black, LV_OPA_TRANSP, LV_PART_KNOB);
+    lv_obj_set_style_border_width(ring_black, 0, 0);
+    lv_obj_center(ring_black);
+    
     // Äußerer weißer Ring
     lv_obj_t* ring_w = lv_arc_create(clock_container_);
     lv_obj_set_size(ring_w, 236, 236);
