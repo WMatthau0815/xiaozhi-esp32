@@ -4,6 +4,7 @@
 #include "mcp_server.h"
 #include <esp_log.h>
 #include <driver/gpio.h>
+#include <cmath>
 #include "onewire_bus.h"
 #include "ds18b20.h"
 
@@ -60,7 +61,15 @@ public:
                 return std::string(buf);
             });
     }
-
+    float ReadCelsius() {
+        if (!found_) return NAN;
+        float temperature = 0.0f;
+        if (ds18b20_trigger_temperature_conversion(sensor_) != ESP_OK ||
+            ds18b20_get_temperature(sensor_, &temperature) != ESP_OK) {
+            return NAN;
+        }
+        return temperature;
+    }
 private:
     onewire_bus_handle_t bus_ = nullptr;
     ds18b20_device_handle_t sensor_ = nullptr;
