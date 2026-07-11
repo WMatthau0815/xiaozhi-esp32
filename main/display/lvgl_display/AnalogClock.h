@@ -3,7 +3,7 @@
 #include "display.h"
 #include "temperature_sensor.h"   // NEU
 
-#define TEMP_LABEL_Y 40   // absolute Y-Position von oben, unabhängig von Uhr-Mittelpunkt
+#define TEMP_LABEL_Y 70   // absolute Y-Position von oben, unabhängig von Uhr-Mittelpunkt
 
 class AnalogClock {
 public:
