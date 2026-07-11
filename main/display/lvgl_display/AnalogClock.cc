@@ -15,6 +15,8 @@ lv_obj_t*  AnalogClock::center_dot_     = nullptr;
 lv_obj_t*  AnalogClock::clock_container_ = nullptr;
 lv_timer_t* AnalogClock::clock_timer_   = nullptr;
 Display*    AnalogClock::display_       = nullptr;   // <<< DIESE ZEILE NEU EINFÜGEN
+lv_obj_t* AnalogClock::temp_label_ = nullptr;
+TemperatureSensor* AnalogClock::temp_sensor_ = nullptr;
 int         AnalogClock::cx_            = 120;
 int         AnalogClock::cy_            = 120;
 
@@ -123,6 +125,12 @@ void AnalogClock::DrawFace(lv_obj_t* parent) {
     lv_obj_set_style_border_width(center_dot_, 0, 0);
     lv_obj_set_style_pad_all(center_dot_, 0, 0);
     lv_obj_set_pos(center_dot_, cx_ - 3, cy_ - 3);
+
+    // Temperatur-Label
+    temp_label_ = lv_label_create(clock_container_);
+    lv_obj_set_style_text_color(temp_label_, lv_color_hex(0xFFFFFF), 0);
+    lv_label_set_text(temp_label_, "--.-\xC2\xB0" "C");  // Platzhalter, "°C" als UTF-8
+    lv_obj_align(temp_label_, LV_ALIGN_CENTER, 0, -TEMP_LABEL_Y_OFFSET);
 }
 
 // --- Zeiger updaten ---
@@ -152,18 +160,31 @@ void AnalogClock::UpdateHands() {
 
     lv_obj_move_foreground(center_dot_);
 }
-
+//WZ, 11JUL26 Temp.-sensor
+void AnalogClock::UpdateTemperature() {
+    if (!temp_sensor_ || !temp_label_) return;
+    float t = temp_sensor_->ReadCelsius();
+    char buf[16];
+    if (std::isnan(t)) {
+        snprintf(buf, sizeof(buf), "--.-\xC2\xB0" "C");
+    } else {
+        snprintf(buf, sizeof(buf), "%.1f\xC2\xB0" "C", t);
+    }
+    lv_label_set_text(temp_label_, buf);
+}
 // --- Public: Start ---
-void AnalogClock::Start(lv_obj_t* parent, Display* display) {
+void AnalogClock::Start(lv_obj_t* parent, Display* display, TemperatureSensor* temp_sensor) {
     if (clock_container_ != nullptr) {
         ESP_LOGW(TAG, "AnalogClock already running");
         return;
     }
     display_ = display;
+    temp_sensor_ = temp_sensor;   // NEU
     DisplayLockGuard lock(display_);
     ESP_LOGI(TAG, "AnalogClock Start");
     DrawFace(parent);
     UpdateHands();
+    UpdateTemperature();          // NEU
     clock_timer_ = lv_timer_create(TimerCb, 1000, nullptr);
 }
 
@@ -181,6 +202,7 @@ void AnalogClock::Stop(Display* display) {
     }
     sec_hand_ = sec_cw_ = min_hand_ = hr_hand_ = center_dot_ = nullptr;
     display_ = nullptr;
+    temp_sensor_ = nullptr;   // NEU
 }
 
 // --- Timer Callback ---
@@ -188,4 +210,5 @@ void AnalogClock::TimerCb(lv_timer_t* timer) {
     if (!display_) return;
     DisplayLockGuard lock(display_);
     UpdateHands();
+    UpdateTemperature();   // NEU
 }
