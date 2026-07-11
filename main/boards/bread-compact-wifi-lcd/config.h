@@ -286,5 +286,7 @@
 
 // A MCP Test: Control a lamp
 #define LAMP_GPIO GPIO_NUM_18
+// DS18B20 Temp.-sensor
+#define DS18B20_GPIO GPIO_NUM_17
 
 #endif // _BOARD_CONFIG_H_
