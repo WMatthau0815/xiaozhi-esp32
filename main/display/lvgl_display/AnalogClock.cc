@@ -17,8 +17,8 @@ lv_timer_t* AnalogClock::clock_timer_   = nullptr;
 Display*    AnalogClock::display_       = nullptr;   // <<< DIESE ZEILE NEU EINFÜGEN
 lv_obj_t* AnalogClock::temp_label_ = nullptr;
 TemperatureSensor* AnalogClock::temp_sensor_ = nullptr;
-int         AnalogClock::cx_            = 120;
-int         AnalogClock::cy_            = 120;
+int         AnalogClock::cx_            = 120;   
+int         AnalogClock::cy_            = 200;   //for GC9A01 it's 120 (half of 240), for ST7789 it's 320-120 = 200
 
 lv_point_precise_t AnalogClock::sec_pts_[2]    = {};
 lv_point_precise_t AnalogClock::sec_cw_pts_[2] = {};
@@ -53,8 +53,8 @@ void AnalogClock::DrawFace(lv_obj_t* parent) {
                     lv_display_get_vertical_resolution(lv_display_get_default()));
     lv_obj_set_pos(clock_container_, 0, 0);
     lv_obj_set_style_bg_color(clock_container_, lv_color_hex(0x000000), 0);
-//    lv_obj_set_style_bg_opa(clock_container_, LV_OPA_COVER, 0);
-    lv_obj_set_style_bg_opa(clock_container_, LV_OPA_TRANSP, 0);
+    lv_obj_set_style_bg_opa(clock_container_, LV_OPA_COVER, 0);
+//    lv_obj_set_style_bg_opa(clock_container_, LV_OPA_TRANSP, 0);
     lv_obj_set_style_border_width(clock_container_, 0, 0);
     lv_obj_set_style_pad_all(clock_container_, 0, 0);
     lv_obj_clear_flag(clock_container_, LV_OBJ_FLAG_SCROLLABLE);
@@ -140,12 +140,12 @@ void AnalogClock::DrawFace(lv_obj_t* parent) {
     lv_obj_set_pos(center_dot_, cx_ - 3, cy_ - 3);
 
     // Temperatur-Label
-    temp_label_ = lv_label_create(clock_container_);
-    lv_obj_set_style_text_color(temp_label_, lv_color_hex(0xFFFFFF), 0);
-    lv_label_set_text(temp_label_, "--.-\xC2\xB0" "C");  // Platzhalter, "°C" als UTF-8
-    lv_obj_set_pos(temp_label_, 0, TEMP_LABEL_Y);
-    lv_obj_set_width(temp_label_, lv_display_get_horizontal_resolution(lv_display_get_default()));
-    lv_obj_set_style_text_align(temp_label_, LV_TEXT_ALIGN_CENTER, 0);
+//    temp_label_ = lv_label_create(clock_container_);
+//    lv_obj_set_style_text_color(temp_label_, lv_color_hex(0xFFFFFF), 0);
+//    lv_label_set_text(temp_label_, "--.-\xC2\xB0" "C");  // Platzhalter, "°C" als UTF-8
+//    lv_obj_set_pos(temp_label_, 0, TEMP_LABEL_Y);
+//    lv_obj_set_width(temp_label_, lv_display_get_horizontal_resolution(lv_display_get_default()));
+//    lv_obj_set_style_text_align(temp_label_, LV_TEXT_ALIGN_CENTER, 0);
 }
 
 // --- Zeiger updaten ---
@@ -175,6 +175,7 @@ void AnalogClock::UpdateHands() {
 
     lv_obj_move_foreground(center_dot_);
 }
+/*
 //WZ, 11JUL26 Temp.-sensor
 void AnalogClock::UpdateTemperature() {
     if (!temp_sensor_ || !temp_label_) return;
@@ -187,6 +188,7 @@ void AnalogClock::UpdateTemperature() {
     }
     lv_label_set_text(temp_label_, buf);
 }
+*/
 // --- Public: Start ---
 void AnalogClock::Start(lv_obj_t* parent, Display* display, TemperatureSensor* temp_sensor) {
     if (clock_container_ != nullptr) {
@@ -194,12 +196,12 @@ void AnalogClock::Start(lv_obj_t* parent, Display* display, TemperatureSensor* t
         return;
     }
     display_ = display;
-    temp_sensor_ = temp_sensor;   // NEU
+//    temp_sensor_ = temp_sensor;   // NEU
     DisplayLockGuard lock(display_);
     ESP_LOGI(TAG, "AnalogClock Start");
     DrawFace(parent);
     UpdateHands();
-    UpdateTemperature();          // NEU
+//    UpdateTemperature();          // NEU
     clock_timer_ = lv_timer_create(TimerCb, 1000, nullptr);
 }
 
@@ -217,7 +219,7 @@ void AnalogClock::Stop(Display* display) {
     }
     sec_hand_ = sec_cw_ = min_hand_ = hr_hand_ = center_dot_ = nullptr;
     display_ = nullptr;
-    temp_sensor_ = nullptr;   // NEU
+//    temp_sensor_ = nullptr;   // NEU
 }
 
 // --- Timer Callback ---
@@ -225,5 +227,5 @@ void AnalogClock::TimerCb(lv_timer_t* timer) {
     if (!display_) return;
     DisplayLockGuard lock(display_);
     UpdateHands();
-    UpdateTemperature();   // NEU
+//    UpdateTemperature();   // NEU
 }
