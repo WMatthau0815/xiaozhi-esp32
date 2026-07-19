@@ -18,7 +18,7 @@
 #include <esp_lcd_panel_ops.h>
 #include <driver/spi_common.h>
 #include "display/lvgl_display/AnalogClock.h"
-#include "temperature_sensor.h"
+//#include "temperature_sensor.h"
 
 #if defined(LCD_TYPE_ILI9341_SERIAL)
 #include "esp_lcd_ili9341.h"
@@ -71,7 +71,7 @@ private:
     esp_lcd_panel_handle_t panel_;      // Muss vorhanden sein
     esp_lcd_panel_io_handle_t panel_io_; // Optional, für manuelle Befehle
     PowerSaveTimer* power_save_timer_ = nullptr;
-    TemperatureSensor* room_temp_ = nullptr;   // NEU
+//    TemperatureSensor* room_temp_ = nullptr;   // NEU
 
     void InitializeSpi() {
         spi_bus_config_t buscfg = {};
@@ -142,8 +142,8 @@ void InitializePowerSaveTimer() {
         app.Schedule([this]() {
             GetDisplay()->SetPowerSaveMode(true);
             GetDisplay()->SetEmotion("sleepy");
-//            AnalogClock::Start(lv_scr_act(), GetDisplay());   // GEÄNDERT
-            AnalogClock::Start(lv_scr_act(), GetDisplay(), room_temp_);   // GEÄNDERT: room_temp_ ergänzt
+            AnalogClock::Start(lv_scr_act(), GetDisplay());   // GEÄNDERT
+//            AnalogClock::Start(lv_scr_act(), GetDisplay(), room_temp_);   // GEÄNDERT: room_temp_ ergänzt
              if (auto* bl = GetBacklight()) bl->SetBrightness(1);
         });
     });
@@ -175,9 +175,9 @@ void InitializeTools() {
     #ifdef LAMP_GPIO
     static LampController lamp(LAMP_GPIO);
     #endif
-    #ifdef DS18B20_GPIO
-    room_temp_ = new TemperatureSensor(DS18B20_GPIO);   // GEÄNDERT: new statt static-lokal
-    #endif
+//    #ifdef DS18B20_GPIO
+//    room_temp_ = new TemperatureSensor(DS18B20_GPIO);   // GEÄNDERT: new statt static-lokal
+//    #endif
 }
 public:
     CompactWifiBoardLCD() :
