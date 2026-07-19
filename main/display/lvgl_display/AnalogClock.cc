@@ -15,8 +15,8 @@ lv_obj_t*  AnalogClock::center_dot_     = nullptr;
 lv_obj_t*  AnalogClock::clock_container_ = nullptr;
 lv_timer_t* AnalogClock::clock_timer_   = nullptr;
 Display*    AnalogClock::display_       = nullptr;   // <<< DIESE ZEILE NEU EINFÜGEN
-lv_obj_t* AnalogClock::temp_label_ = nullptr;
-TemperatureSensor* AnalogClock::temp_sensor_ = nullptr;
+//lv_obj_t* AnalogClock::temp_label_ = nullptr;
+//TemperatureSensor* AnalogClock::temp_sensor_ = nullptr;
 int         AnalogClock::cx_            = 120;   
 int         AnalogClock::cy_            = 200;   //for GC9A01 it's 120 (half of 240), for ST7789 it's 320-120 = 200
 
@@ -190,7 +190,8 @@ void AnalogClock::UpdateTemperature() {
 }
 */
 // --- Public: Start ---
-void AnalogClock::Start(lv_obj_t* parent, Display* display, TemperatureSensor* temp_sensor) {
+//void AnalogClock::Start(lv_obj_t* parent, Display* display, TemperatureSensor* temp_sensor) {
+void AnalogClock::Start(lv_obj_t* parent, Display* display) {
     if (clock_container_ != nullptr) {
         ESP_LOGW(TAG, "AnalogClock already running");
         return;
