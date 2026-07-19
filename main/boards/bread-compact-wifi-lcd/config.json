@@ -2,7 +2,7 @@
     "target": "esp32s3",
     "builds": [
         {
-            "name": "bread-compact-wifi-lcd-gc9a01",
+            "name": "bread-compact-wifi-lcd-ST7789",
             "sdkconfig_append": [
                 "CONFIG_LCD_ST7789_240X320=y",
                 "CONFIG_USE_MULTILINE_CHAT_MESSAGE=y",
