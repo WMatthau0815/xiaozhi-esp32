@@ -197,7 +197,7 @@ public:
     // 👇 Add this destructor
     ~CompactWifiBoardLCD() {
         delete power_save_timer_;
-        delete room_temp_;   // NEU
+//        delete room_temp_;   // NEU
     }
 
 virtual Led* GetLed() override {
