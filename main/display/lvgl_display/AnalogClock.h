@@ -7,7 +7,8 @@
 
 class AnalogClock {
 public:
-    static void Start(lv_obj_t* parent, Display* display, TemperatureSensor* temp_sensor);  // GEÄNDERT
+//    static void Start(lv_obj_t* parent, Display* display, TemperatureSensor* temp_sensor);  // GEÄNDERT
+    static void Start(lv_obj_t* parent, Display* display);  // GEÄNDERT
     static void Stop(Display* display);
 private:
     static void TimerCb(lv_timer_t* timer);
